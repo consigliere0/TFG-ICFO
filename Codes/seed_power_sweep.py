@@ -23,7 +23,7 @@ def run_seed_power_sweep():
 
     # --- 3. OSA PARAMETERS ---
     center_wl = 1549.646
-    osa_span = 90.0
+    osa_span = 25.0
     osa_res = 0.1
 
     try:

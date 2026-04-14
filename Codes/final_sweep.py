@@ -6,20 +6,20 @@ import os
 def run_fwm_sweep():
     rm = pyvisa.ResourceManager()
 
-    new_folder = "FWM_sweep_test_01"
+    new_folder = "FWM_sweep_test_02"
     os.makedirs(new_folder, exist_ok=True)  
 
     santec_ip = "192.168.1.100"
     osa_ip = "192.168.55.10"
 
     # Seed parameters
-    start_wl = 1540.0
-    end_wl = 1570.0
+    start_wl = 1500.0
+    end_wl = 1600.0
     step_size = 1.0
 
     # OSA parameters
     center_wl = 1549.646
-    osa_span = 90.0
+    osa_span = 220.0
     osa_res = 0.1
 
     try:
