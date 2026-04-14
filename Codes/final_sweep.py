@@ -6,7 +6,7 @@ import os
 def run_fwm_sweep():
     rm = pyvisa.ResourceManager()
 
-    new_folder = "FWM_sweep_test_02"
+    new_folder = "FWM_sweep_test_05"
     os.makedirs(new_folder, exist_ok=True)  
 
     santec_ip = "192.168.1.100"
@@ -18,9 +18,9 @@ def run_fwm_sweep():
     step_size = 1.0
 
     # OSA parameters
-    center_wl = 1549.646
-    osa_span = 220.0
-    osa_res = 0.1
+    center_wl = 1550.000
+    osa_span = 200.0
+    osa_res = 0.5
 
     try:
         print("WASSUP GANG")

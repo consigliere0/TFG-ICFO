@@ -1,0 +1,37 @@
+FWM_sweep_test_04
+    # Seed parameters
+    start_wl = 1500.0
+    end_wl = 1600.0
+    step_size = 1.0
+
+    # OSA parameters
+    center_wl = 1530.000
+    osa_span = 200.0
+    osa_res = 0.5
+
+	SANTEC (Seed): Power: 12.20 dBm, Attenuator 1.00dB
+
+FWM_sweep_test_02
+    # Seed parameters
+    start_wl = 1500.0
+    end_wl = 1600.0
+    step_size = 1.0
+
+    # OSA parameters
+    center_wl = 1530.000
+    osa_span = 220.0
+    osa_res = 0.1
+
+
+FWM_sweep_test_05
+    # Seed parameters
+    start_wl = 1500.0
+    end_wl = 1600.0
+    step_size = 1.0
+
+    # OSA parameters
+    center_wl = 1550.000
+    osa_span = 200.0
+    osa_res = 0.5
+
+	SANTEC (Seed): Power: 12.20 dBm, Attenuator 1.00dB
