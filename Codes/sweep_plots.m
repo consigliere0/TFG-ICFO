@@ -11,7 +11,7 @@ set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegend
 %-------------
 %%  LOAD DATA
 %-------------
-dataFolder = '../Tests/FWM_Sweep_Test_01';
+dataFolder = '../Tests/FWM_sweep_test_03';
 filePattern = fullfile(dataFolder, '*.csv');
 csvFiles = dir(filePattern);
 numFiles=length(csvFiles);
@@ -32,9 +32,15 @@ end
 % ------------
 for i = [1, 10, 11, 12, 31]
     sanityCheck = sweepData{i};
-    figure(i)
+    fig = figure(i);
     plot(sanityCheck(:,1), sanityCheck(:,2), 'Color', '#000000');
-    xlabel('Wavelength'); ylabel('Power (dBm)')
+    xlabel('Wavelength'); ylabel('Power (dBm)');
+    title(sprintf('Sweep Data for File %d', i));
+    grid on;
+    outFolder = '../Tests/FWM_sweep_test_03';
+    if ~exist(outFolder, 'dir'), mkdir(outFolder); end
+    fname = fullfile(outFolder, sprintf('plot_single_%02d.png', i));
+    saveas(fig, fname);
     i = i+1;
 end
 
@@ -104,9 +110,14 @@ genPower_mW = 10.^(genPower(:,2) / 10);
 seedPower_mW = 10.^(seedPower(:,2) / 10);
 conv_eff_lin = genPower_mW ./ seedPower_mW;
 
-figure('Name', 'FWM Conversion Efficiency dB')
+fig = figure('Name', 'FWM Conversion Efficiency dB');
 plot(wl_idler, conv_eff_dB, 'squarek', 'LineWidth', 1.5, 'MarkerFaceColor', 'k')
-axis([1530 1561 -40 0]); grid on
+%axis([1490 1610 -45 -20]); grid on
 xlabel('Generated photon wavelength (nm)')
 ylabel('FWM Conversion Efficiency (dB)')
 title('FWM Conversion Efficiency')
+
+outFolder = '../Tests/FWM_sweep_test_03';
+if ~exist(outFolder, 'dir'), mkdir(outFolder); end
+saveas(fig, fullfile(outFolder, 'FWM_conv_eff_dB.png'));
+%print(fig, fullfile(outFolder, 'FWM_conv_eff_dB.pdf'), '-dpdf');
