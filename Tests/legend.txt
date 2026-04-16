@@ -47,3 +47,14 @@ FWM_sweep_test_05
     osa_res = 0.5
 
 	SANTEC (Seed): Power: 12.20 dBm, Attenuator 1.00dB
+
+
+
+
+Pump_Sweep_01
+??
+
+Pump_Sweep_02
+   Seed wvl = 1545nm
+   Power 12.47 dBm
+   Attenuator 1.00 dBm

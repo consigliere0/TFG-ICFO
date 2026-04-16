@@ -1,0 +1,5 @@
+Pure Photonics GUI:
+C:\Users\Public\Documents\Project\Pure-Photonics-GUI-2025.05.19\Pure Photonics GUI 2025.05.19
+
+Lab PC repo path:
+C:\Users\lgonzalez\Documents\TFG\TFG-ICFO

@@ -8,7 +8,7 @@ def acquire_single_trace(pump_power_dbm):
     osa_ip = "192.168.55.10"
     
     # Canviem el nom de la carpeta perquè no es barregin els experiments
-    folder = "Manual_Pump_Power_Sweep"
+    folder = "Pump_Sweep_02"
     os.makedirs(folder, exist_ok=True)
 
     try:
