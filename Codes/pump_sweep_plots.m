@@ -10,7 +10,7 @@ set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegend
 %-------------
 %%  LOAD DATA
 %-------------
-dataFolder = '../Tests/Manual_Pump_Power_Sweep'; 
+dataFolder = '../Tests/Pump_Sweep_01'; 
 filePattern = fullfile(dataFolder, '*.csv');
 csvFiles = dir(filePattern);
 numFiles = length(csvFiles);

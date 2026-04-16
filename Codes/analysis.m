@@ -10,7 +10,7 @@ set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegend
 %-------------
 %%  LOAD DATA
 %-------------
-dataFolder = '../Tests/FWM_sweep_test_02';
+dataFolder = '../Tests/FWM_sweep_test_02';      % Test 01 irrelevant
 filePattern = fullfile(dataFolder, '*.csv');
 csvFiles = dir(filePattern);
 numFiles=length(csvFiles);
@@ -24,7 +24,7 @@ for k = 1:numFiles
 end
 
 % ------------------------
-%% PEAK TRACKING PIPELINE (Base Teva Original)
+%% PEAK TRACKING PIPELINE
 % ------------------------
 c = 299792458;
 wl_pump = 1.54965e-06; 
@@ -33,13 +33,13 @@ search_window = 0.5e-9;
 
 genPower = zeros(numFiles, 2);
 seedPower = zeros(numFiles, 2);
-pumpPower = zeros(numFiles, 1); % Afegim array pel Pump
+pumpPower = zeros(numFiles, 1); % New pump array
 
 for k = 1:numFiles
     x = sweepData{k}(:,1);
     y = sweepData{k}(:,2);
     
-    % NOU: Extreure potència del Pump (Protegit contra encongiment d'array)
+    % Extract pump power
     is_pump = (x >= (wl_pump - pump_window)) & (x <= (wl_pump + pump_window));
     if any(is_pump)
         pumpPower(k) = max(y(is_pump));
@@ -84,14 +84,14 @@ for k = 1:numFiles
 end
 
 % Eliminar l'element que vas determinar als teus tests anteriors
-genPower(11,:) = []; 
-seedPower(11,:) = [];
-pumpPower(11) = [];
+% genPower(11,:) = []; 
+% seedPower(11,:) = [];
+% pumpPower(11) = [];
 
-% -------------------
-%% FILTRATGE I ORDENACIÓ
-% -------------------
-% Filtrem els punts morts (NaN) per poder fer càlculs matemàtics nets
+% ----------------------
+%% FILTERING & ORDERING
+% ----------------------
+% Filter out NaNs
 valid = ~isnan(genPower(:,1)) & ~isnan(pumpPower);
 
 wl_idler_nm = genPower(valid, 1) * 1e9;
@@ -99,15 +99,15 @@ P_idler_dBm = genPower(valid, 2);
 P_seed_dBm  = seedPower(valid, 2);
 P_pump_dBm  = pumpPower(valid);
 
-% Ordenar l'eix X (longitud d'ona) de menor a major perquè el plot no faci ziga-zagues
+% Order x-axis from - to + (so that it doesn't zig zag)
 [wl_idler_nm, sortIdx] = sort(wl_idler_nm);
 P_idler_dBm = P_idler_dBm(sortIdx);
 P_seed_dBm  = P_seed_dBm(sortIdx);
 P_pump_dBm  = P_pump_dBm(sortIdx);
 
-% ---------------------------------------------------------
-%% PLOT B: 3-dB BANDWIDTH & CONVERSION EFFICIENCY
-% ---------------------------------------------------------
+% ----------------------------------------
+%% 3-dB BANDWIDTH & CONVERSION EFFICIENCY
+% ----------------------------------------
 conv_eff_dB = P_idler_dBm - P_seed_dBm;
 
 fig1 = figure('Name', '3-dB Bandwidth', 'Position', [100, 100, 700, 500]);
@@ -138,29 +138,29 @@ ylabel('Conversion Efficiency (dB)');
 title('FWM Conversion Efficiency \& 3-dB Bandwidth');
 hold off;
 
-% ---------------------------------------------------------
-%% PLOT A: NORMALIZED EFFICIENCY (W^-2)
-% ---------------------------------------------------------
-% 1. Passar els dBm a lineal (Watts, atenció: no mW sinó W)
+% ------------------------------
+%% NORMALIZED EFFICIENCY (W^-2)
+% ------------------------------
+% dBm --> Linear (Watts!! not mW)
 P_idler_W = 10.^((P_idler_dBm - 30) / 10);
 P_seed_W  = 10.^((P_seed_dBm - 30) / 10);
 P_pump_W  = 10.^((P_pump_dBm - 30) / 10);
 
-% 2. Aplicar la física teòrica de la Normalització
+% Normalize
 norm_eff_W2 = P_idler_W ./ (P_seed_W .* (P_pump_W.^2));
 
-% 3. Expressar el resultat final en escala logarítmica
+% Final result in log scale
 norm_eff_dB_W2 = 10 * log10(norm_eff_W2);
 
 fig2 = figure('Name', 'Normalized Efficiency', 'Position', [850, 100, 700, 500]);
-plot(wl_idler_nm, norm_eff_dB_W2, 'pentagramk', 'LineWidth', 1.5, 'MarkerFaceColor', 'k');
+plot(wl_idler_nm, norm_eff_dB_W2, 'squarek', 'LineWidth', 1.5, 'MarkerFaceColor', 'k');
 grid on;
 xlabel('Generated photon wavelength (nm)'); 
 ylabel('Normalized Efficiency $10\log_{10}(\eta_{norm})$ [dB W$^{-2}$]');
 title('Normalized FWM Efficiency ($\eta_{norm}$)');
 
-% Guardar resultats
+% Save results
 outFolder = dataFolder;
 if ~exist(outFolder, 'dir'), mkdir(outFolder); end
 saveas(fig1, fullfile(outFolder, 'Bandwidth_3dB.png'));
-saveas(fig2, fullfile(outFolder, 'Normalized_Efficiency.png'));
+saveas(fig2, fullfile(outFolder, 'Norm_ce.png'));
