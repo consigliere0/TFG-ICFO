@@ -15,7 +15,7 @@ set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegend
 %-------------
 %%  LOAD DATA
 %-------------
-dataFolder = '../Tests/FWM_sweep_test_05';      % Test 01 irrelevant
+dataFolder = '../Tests/FWM_sweep_test_02';      % Test 01 irrelevant
 filePattern = fullfile(dataFolder, '*.csv');
 csvFiles = dir(filePattern);
 numFiles=length(csvFiles);
@@ -173,68 +173,54 @@ saveas(fig2, fullfile(outFolder, 'Norm_ce.png'));
 
 
 % ---------------------------------------------------------
-%% THEORETICAL BANDWIDTH FIT (SINC^2) - ALL DISPERSIONS
+%% THEORETICAL BANDWIDTH FIT (SINC^2)
 % ---------------------------------------------------------
+% Load simulated eff index from .mat
 simData = load('class_Si_trad_w_0.5_0.1_1_h_0.22_lda_1.2_0.025_1.6.mat');
+Lambda_sim = simData.sTE.w(6).o(1).lda;      % Wavelengths in meters
+neff_sim = real(simData.sTE.w(6).o(1).neff); % Real part of the Effective Index
 
-% Automatically get the number of widths simulated in the .mat file
-num_widths = length(simData.sTE.w);
-widths_to_test = 1:num_widths; % This will test all indices from 1 to 6
+% Extract experimental wavelengths (in meters) to match arrays
+wl_idler_m = wl_idler_nm * 1e-9;
+wl_seed_m = seedPower(valid, 1);
+wl_seed_m = wl_seed_m(sortIdx);  % Apply the same sorting to keep them aligned
 
-% Define 6 distinct colors for the 6 different curves
-colors = {'#0072BD', '#D95319', '#EDB120', '#7E2F8E', '#77AC30', '#4DBEEE'};
-legend_entries = {'Experimental Data'}; % Start legend array
+% 2. INTERPOLATE THE SIMULATION TO YOUR EXACT EXPERIMENTAL WAVELENGTHS
+% We ask MATLAB: "What was the effective index exactly at the pump, seed, and idler wavelengths?"
+n_pump  = interp1(Lambda_sim, neff_sim, wl_pump, 'spline');
+n_seed  = interp1(Lambda_sim, neff_sim, wl_seed_m, 'spline');
+n_idler = interp1(Lambda_sim, neff_sim, wl_idler_m, 'spline');
 
-L = 0.01; % Waveguide length (1.0 cm)
+% 3. CALCULATE PROPAGATION CONSTANTS (Beta)
+% Formula: Beta = 2 * pi * neff / Lambda
+beta_pump  = 2 * pi * n_pump / wl_pump;
+beta_seed  = 2 * pi .* n_seed ./ wl_seed_m;
+beta_idler = 2 * pi .* n_idler ./ wl_idler_m;
 
+% 4. CALCULATE PHASE MISMATCH (Delta Beta)
+% Formula from the paper: DeltaBeta = Beta_Seed + Beta_Idler - 2*Beta_Pump
+delta_beta = beta_seed + beta_idler - 2 * beta_pump;
+
+% 5. CALCULATE THE THEORETICAL SINC^2 CURVE
+L = 0.01; % <--- YOUR ONLY MANUAL TASK! Waveguide length in meters (0.015 = 1.5 cm)
+           % Tweak this number slightly (e.g., 0.014, 0.016) to make the fit wider/narrower!
+
+phase_term = (delta_beta .* L) / 2;
+
+% Note: MATLAB's sinc(x) function mathematically computes sin(pi*x)/(pi*x). 
+% Since the physics formula doesn't have the pi inside, we divide by pi to cancel it out.
+sinc_sq = (sinc(phase_term / pi)).^2;
+
+% 6. OVERLAY THE FIT ONTO YOUR EXPERIMENTAL NORMALIZED EFFICIENCY
+max_exp_eff_dB = max(norm_eff_dB_W2); % Align the peaks
+theo_eff_dB = max_exp_eff_dB + 10 * log10(sinc_sq);
+
+% Open the existing Normalized Efficiency figure (fig2 from previous code)
 figure(fig2); 
 hold on;
-
-for i = 1:length(widths_to_test)
-    w_idx = widths_to_test(i);
-    
-    % Load simulated eff index from .mat for THIS specific width
-    Lambda_sim = simData.sTE.w(w_idx).o(1).lda;      
-    neff_sim = real(simData.sTE.w(w_idx).o(1).neff); 
-    
-    % Extract experimental wavelengths (in meters) to match arrays
-    wl_idler_m = wl_idler_nm * 1e-9;
-    wl_seed_m = seedPower(valid, 1);
-    wl_seed_m = wl_seed_m(sortIdx);  
-    
-    % Interpolate
-    n_pump  = interp1(Lambda_sim, neff_sim, wl_pump, 'spline');
-    n_seed  = interp1(Lambda_sim, neff_sim, wl_seed_m, 'spline');
-    n_idler = interp1(Lambda_sim, neff_sim, wl_idler_m, 'spline');
-    
-    % Calculate propagation constants (beta)
-    beta_pump  = 2 * pi * n_pump / wl_pump;
-    beta_seed  = 2 * pi .* n_seed ./ wl_seed_m;
-    beta_idler = 2 * pi .* n_idler ./ wl_idler_m;
-    
-    % Calculate phase-mismatch (\Delta beta)
-    delta_beta = beta_seed + beta_idler - 2 * beta_pump;
-    
-    % Calculate theoretical sinc^2 curve
-    phase_term = (delta_beta .* L) / 2;
-    sinc_sq = (sinc(phase_term / pi)).^2;
-    %sinc_sq = (sinc(phase_term)).^2;
-    
-    % Overlay fit to exp normalized efficiency
-    max_exp_eff_dB = max(norm_eff_dB_W2); 
-    theo_eff_dB = max_exp_eff_dB + 10 * log10(sinc_sq);
-    
-    % Plot this specific curve using a unique color from our palette
-    plot(wl_idler_nm, theo_eff_dB, '-', 'Color', colors{i}, 'LineWidth', 1);
-    
-    % Add to legend string
-    real_width_um = 0.5 + (w_idx - 1) * 0.1; % Math to get real width from index
-    legend_entries{end+1} = sprintf('Simulated $w = %.1f \\mu m$', real_width_um);
-end
-
-% Set final legend
-legend(legend_entries, 'Location', 'best', 'Interpreter', 'latex');
+% Draw the theoretical fit as a solid red line
+plot(wl_idler_nm, theo_eff_dB, '-r', 'LineWidth', 2);
+legend('Experimental Data', 'Theoretical Sinc^2 Fit', 'Location', 'best', 'Interpreter', 'latex');
 hold off;
 
-% Resave the updated figure
-saveas(fig2, fullfile(outFolder, 'Norm_ce_with_all_simulations.png'));
+disp('Theoretical Fit completed. If the red line is too wide or narrow, adjust the "L" parameter!');
