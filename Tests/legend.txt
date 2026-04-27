@@ -49,6 +49,20 @@ FWM_sweep_test_05
 	SANTEC (Seed): Power: 12.20 dBm, Attenuator 1.00dB
 
 
+FWM_sweep_test_06
+    # Seed parameters
+    start_wl = 1450.0
+    end_wl = 1650.0
+    step_size = 1.0
+
+    # OSA parameters
+    center_wl = 1550.000
+    osa_span = 200.0
+    osa_res = 0.5
+
+	SANTEC (Seed): Power: 12.00 dBm, Attenuator 1.00dB
+
+
 
 
 Pump_Sweep_01

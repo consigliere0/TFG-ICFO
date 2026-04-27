@@ -2,7 +2,6 @@
 %% Plots the normalized efficiency & the -3dB bandwidth
 % --------------------------------------------------------
 
-
 % ----------
 %% SETTINGS
 % ----------
@@ -15,11 +14,13 @@ set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegend
 %-------------
 %%  LOAD DATA
 %-------------
-dataFolder = '../Tests/FWM_sweep_test_02';      % Test 01 irrelevant
+dataFolder = '../Tests/FWM_sweep_test_05';      
 filePattern = fullfile(dataFolder, '*.csv');
 csvFiles = dir(filePattern);
 numFiles=length(csvFiles);
+
 sweepData = cell(numFiles, 1);
+
 for k = 1:numFiles
     % Path for current file
     baseFileName = csvFiles(k).name;
@@ -33,8 +34,8 @@ end
 % ------------------------
 c = 299792458;
 wl_pump = 1.54965e-06; 
-pump_window = 0.1e-9; 
-search_window = 0.5e-9;
+pump_window = 0.5e-9;       % Widened window
+search_window = 1.0e-9;     % Widened to account for OSA resolution
 
 genPower = zeros(numFiles, 2);
 seedPower = zeros(numFiles, 2);
@@ -43,6 +44,13 @@ pumpPower = zeros(numFiles, 1); % New pump array
 for k = 1:numFiles
     x = sweepData{k}(:,1);
     y = sweepData{k}(:,2);
+    
+    % --- THE FIX: AUTO UNIT CONVERSION ---
+    % If x is in nanometers (values like 1500), convert to meters
+    if mean(x) > 1000
+        x = x * 1e-9;
+    end
+    % -------------------------------------
     
     % Extract pump power
     is_pump = (x >= (wl_pump - pump_window)) & (x <= (wl_pump + pump_window));
@@ -57,25 +65,26 @@ for k = 1:numFiles
     x_noPump = x(not_pump);
     y_noPump = y(not_pump);
     
-    % Max oustide region = seed
+    % Max outside region = seed
     [maxSeedPower, seedIdx] = max(y_noPump);
     wl_seed = x_noPump(seedIdx);
     seedPower(k, 1) = wl_seed; 
     seedPower(k, 2) = maxSeedPower; 
     
     % Reject seed = pump
-    if abs(wl_seed - wl_pump) < 0.00112e-6
+    if abs(wl_seed - wl_pump) < 0.0015e-6
         genPower(k,1) = NaN;
         genPower(k,2) = NaN;
         continue;           
     end
     
     % Calculate idler theoretical position
-    w_pump = c / wl_pump; w_seed = c / wl_seed;
+    w_pump = c / wl_pump; 
+    w_seed = c / wl_seed;
     w_idler = 2*w_pump - w_seed;
     wl_idlerTheo = c / w_idler;
     
-    % Dynamic window arround theo value
+    % Dynamic window around theo value
     int = (x >= (wl_idlerTheo - search_window)) & (x <= (wl_idlerTheo + search_window));
     if any(int)
         [maxY, relIdx] = max(y(int));
@@ -88,16 +97,11 @@ for k = 1:numFiles
     end
 end
 
-% Eliminar l'element que vas determinar als teus tests anteriors
-% genPower(11,:) = []; 
-% seedPower(11,:) = [];
-% pumpPower(11) = [];
-
 % ----------------------
 %% FILTERING & ORDERING
 % ----------------------
-% Filter out NaNs
-valid = ~isnan(genPower(:,1)) & ~isnan(pumpPower);
+% Filter out NaNs (Robust check across all three extracted parameters)
+valid = ~isnan(genPower(:,1)) & ~isnan(pumpPower) & ~isnan(seedPower(:,1));
 
 wl_idler_nm = genPower(valid, 1) * 1e9;
 P_idler_dBm = genPower(valid, 2);
@@ -136,7 +140,6 @@ if any(idx_3dB)
     txt = sprintf('3-dB BW $\\approx$ %.2f nm', bw_nm);
     text(mean(wl_valid), threshold_3dB - 1, txt, 'BackgroundColor', 'w', 'EdgeColor', 'b', 'Interpreter', 'latex', 'HorizontalAlignment', 'center');
 end
-
 grid on;
 xlabel('Generated photon wavelength (nm)'); 
 ylabel('Conversion Efficiency (dB)');
@@ -170,57 +173,79 @@ if ~exist(outFolder, 'dir'), mkdir(outFolder); end
 saveas(fig1, fullfile(outFolder, 'Bandwidth_3dB.png'));
 saveas(fig2, fullfile(outFolder, 'Norm_ce.png'));
 
-
-
 % ---------------------------------------------------------
-%% THEORETICAL BANDWIDTH FIT (SINC^2)
+%% THEORETICAL BANDWIDTH FIT (SINC^2) - ALL DISPERSIONS
 % ---------------------------------------------------------
-% Load simulated eff index from .mat
 simData = load('class_Si_trad_w_0.5_0.1_1_h_0.22_lda_1.2_0.025_1.6.mat');
-Lambda_sim = simData.sTE.w(6).o(1).lda;      % Wavelengths in meters
-neff_sim = real(simData.sTE.w(6).o(1).neff); % Real part of the Effective Index
 
-% Extract experimental wavelengths (in meters) to match arrays
-wl_idler_m = wl_idler_nm * 1e-9;
-wl_seed_m = seedPower(valid, 1);
-wl_seed_m = wl_seed_m(sortIdx);  % Apply the same sorting to keep them aligned
+num_widths = length(simData.sTE.w);
+widths_to_test = 1:num_widths; 
 
-% 2. INTERPOLATE THE SIMULATION TO YOUR EXACT EXPERIMENTAL WAVELENGTHS
-% We ask MATLAB: "What was the effective index exactly at the pump, seed, and idler wavelengths?"
-n_pump  = interp1(Lambda_sim, neff_sim, wl_pump, 'spline');
-n_seed  = interp1(Lambda_sim, neff_sim, wl_seed_m, 'spline');
-n_idler = interp1(Lambda_sim, neff_sim, wl_idler_m, 'spline');
+colors = {'#0072BD', '#D95319', '#EDB120', '#7E2F8E', '#77AC30', '#4DBEEE'};
+legend_entries = {'Experimental Data'}; % Start legend array
 
-% 3. CALCULATE PROPAGATION CONSTANTS (Beta)
-% Formula: Beta = 2 * pi * neff / Lambda
-beta_pump  = 2 * pi * n_pump / wl_pump;
-beta_seed  = 2 * pi .* n_seed ./ wl_seed_m;
-beta_idler = 2 * pi .* n_idler ./ wl_idler_m;
+L = 0.01; % Waveguide length (1.0 cm)
 
-% 4. CALCULATE PHASE MISMATCH (Delta Beta)
-% Formula from the paper: DeltaBeta = Beta_Seed + Beta_Idler - 2*Beta_Pump
-delta_beta = beta_seed + beta_idler - 2 * beta_pump;
-
-% 5. CALCULATE THE THEORETICAL SINC^2 CURVE
-L = 0.01; % <--- YOUR ONLY MANUAL TASK! Waveguide length in meters (0.015 = 1.5 cm)
-           % Tweak this number slightly (e.g., 0.014, 0.016) to make the fit wider/narrower!
-
-phase_term = (delta_beta .* L) / 2;
-
-% Note: MATLAB's sinc(x) function mathematically computes sin(pi*x)/(pi*x). 
-% Since the physics formula doesn't have the pi inside, we divide by pi to cancel it out.
-sinc_sq = (sinc(phase_term / pi)).^2;
-
-% 6. OVERLAY THE FIT ONTO YOUR EXPERIMENTAL NORMALIZED EFFICIENCY
-max_exp_eff_dB = max(norm_eff_dB_W2); % Align the peaks
-theo_eff_dB = max_exp_eff_dB + 10 * log10(sinc_sq);
-
-% Open the existing Normalized Efficiency figure (fig2 from previous code)
 figure(fig2); 
 hold on;
-% Draw the theoretical fit as a solid red line
-plot(wl_idler_nm, theo_eff_dB, '-r', 'LineWidth', 2);
-legend('Experimental Data', 'Theoretical Sinc^2 Fit', 'Location', 'best', 'Interpreter', 'latex');
+
+for i = 1:length(widths_to_test)
+    w_idx = widths_to_test(i);
+    
+    % Load simulated eff index from .mat for this specific width
+    %Lambda_sim = simData.sTE.w(w_idx).o(1).lda;      
+    %neff_sim = real(simData.sTE.w(w_idx).o(1).neff); 
+    %neff_sim = real(simData.sTE.w(w_idx).o(1).neff_fit);
+
+
+    % Load simulated eff index from .mat for this specific width
+    Lambda_sim = simData.sTE.w(w_idx).o(1).lda;      
+    
+    % Extraemos el objeto matemático del Fit
+    fit_function = simData.sTE.w(w_idx).o(1).neff_fit;
+    
+    % Evaluamos la función pasándole las longitudes de onda, y le quitamos la parte imaginaria
+    neff_sim = real(fit_function(Lambda_sim));
+
+
+    
+    % Extract experimental wavelengths (in meters) to match arrays
+    wl_idler_m = wl_idler_nm * 1e-9;
+    wl_seed_m = seedPower(valid, 1);
+    wl_seed_m = wl_seed_m(sortIdx);  
+    
+    % Interpolate
+    n_pump  = interp1(Lambda_sim, neff_sim, wl_pump, 'spline');
+    n_seed  = interp1(Lambda_sim, neff_sim, wl_seed_m, 'spline');
+    n_idler = interp1(Lambda_sim, neff_sim, wl_idler_m, 'spline');
+    
+    % Calculate propagation constants (beta)
+    beta_pump  = 2 * pi * n_pump / wl_pump;
+    beta_seed  = 2 * pi .* n_seed ./ wl_seed_m;
+    beta_idler = 2 * pi .* n_idler ./ wl_idler_m;
+    
+    % Calculate phase-mismatch (\Delta beta)
+    delta_beta = beta_seed + beta_idler - 2 * beta_pump;
+    
+    % Calculate theoretical sinc^2 curve
+    phase_term = (delta_beta .* L) / 2;
+    sinc_sq = (sinc(phase_term / pi)).^2;
+    
+    % Overlay fit to exp normalized efficiency
+    max_exp_eff_dB = max(norm_eff_dB_W2); 
+    theo_eff_dB = max_exp_eff_dB + 10 * log10(sinc_sq);
+    
+    % Plot this specific curve using a unique color from our palette
+    plot(wl_idler_nm, theo_eff_dB, '-', 'Color', colors{i}, 'LineWidth', 1);
+    
+    % Add to legend string
+    real_width_um = 0.5 + (w_idx - 1) * 0.1; % Math to get real width from index
+    legend_entries{end+1} = sprintf('Simulated $w = %.1f \\mu m$', real_width_um);
+end
+
+% Set final legend
+legend(legend_entries, 'Location', 'best', 'Interpreter', 'latex');
 hold off;
 
-disp('Theoretical Fit completed. If the red line is too wide or narrow, adjust the "L" parameter!');
+% Resave the updated figure
+saveas(fig2, fullfile(outFolder, 'Norm_ce_with_all_simulations.png'));

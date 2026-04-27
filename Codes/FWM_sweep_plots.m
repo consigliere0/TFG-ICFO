@@ -17,7 +17,7 @@ set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegend
 %-------------
 %%  LOAD DATA
 %-------------
-dataFolder = '../Tests/FWM_sweep_test_02';
+dataFolder = '../Tests/FWM_sweep_test_06';
 filePattern = fullfile(dataFolder, '*.csv');
 csvFiles = dir(filePattern);
 numFiles=length(csvFiles);
@@ -43,7 +43,7 @@ for i = [1, 11, 30, 50, 51, 60, 80, 90, 100]
     xlabel('Wavelength'); ylabel('Power (dBm)');
     title(sprintf('Sweep Data for File %d', i));
     grid on;
-    outFolder = '../Tests/FWM_sweep_test_02';
+    outFolder = '../Tests/FWM_sweep_test_06';
     if ~exist(outFolder, 'dir'), mkdir(outFolder); end
     fname = fullfile(outFolder, sprintf('plot_single_%02d.png', i));
     saveas(fig, fname);
@@ -57,7 +57,7 @@ end
 
 % Physical constants
 c = 299792458;
-wl_pump = 1.54965e-06; % exp 1550.12nm, but checked graphs
+wl_pump = 1.5496e-06; % exp 1550.12nm, but checked graphs
 pump_window = 0.1e-9; %1.0e-9
 search_window = 0.5e-9;
 
@@ -80,7 +80,7 @@ for k = 1:numFiles
     seedPower(k, 2) = maxSeedPower; % Max seed power
 
     % Reject seed = pump
-    if abs(wl_seed - wl_pump) < 0.00112e-6%8.8e-10     % 8.8e-10 exact
+    if abs(wl_seed - wl_pump) < 8.8e-10 %0.001e-6%0.00112e-6%8.8e-10     % 8.8e-10 exact
         genPower(k,1) = NaN;
         genPower(k,2) = NaN;
         continue;           % maybe include wvl?
@@ -103,27 +103,36 @@ for k = 1:numFiles
         genPower(k, 2) = NaN;
     end
 end
-genPower(11,:) = []; seedPower(11,:) = [];
+%genPower(11,:) = []; seedPower(11,:) = [];
 
 % -------------------
 %% FWM VISUALIZATION
 % -------------------
-wl_idler = genPower(:,1) * 1e9;
 
-conv_eff_dB = genPower(:,2) - seedPower(:,2);
+% 1. Clean up the data (Filter out NaNs so MATLAB can plot properly)
+valid = ~isnan(genPower(:,1)) & ~isnan(seedPower(:,1));
 
-genPower_mW = 10.^(genPower(:,2) / 10);
-seedPower_mW = 10.^(seedPower(:,2) / 10);
+wl_idler_valid = genPower(valid, 1) * 1e9;
+P_idler_dBm_valid = genPower(valid, 2);
+P_seed_dBm_valid = seedPower(valid, 2);
+
+% 2. Calculate Efficiency
+conv_eff_dB = P_idler_dBm_valid - P_seed_dBm_valid;
+
+% (Optional linear calculation if you need it later)
+genPower_mW = 10.^(P_idler_dBm_valid / 10);
+seedPower_mW = 10.^(P_seed_dBm_valid / 10);
 conv_eff_lin = genPower_mW ./ seedPower_mW;
 
+% 3. Plot
 fig = figure('Name', 'FWM Conversion Efficiency dB');
-plot(wl_idler, conv_eff_dB, 'squarek', 'LineWidth', 1.5, 'MarkerFaceColor', 'k')
-%axis([1490 1610 -45 -20]); grid on
-xlabel('Generated photon wavelength (nm)'); grid on
+plot(wl_idler_valid, conv_eff_dB, 'squarek', 'LineWidth', 1.5, 'MarkerFaceColor', 'k')
+grid on;
+xlabel('Generated photon wavelength (nm)'); 
 ylabel('FWM Conversion Efficiency (dB)')
 title('FWM Conversion Efficiency')
 
-outFolder = '../Tests/FWM_sweep_test_02';
+% 4. Save (Make sure it saves to Test_06 folder, not Test_02)
+outFolder = '../Tests/FWM_sweep_test_06';
 if ~exist(outFolder, 'dir'), mkdir(outFolder); end
 saveas(fig, fullfile(outFolder, 'FWM_conv_eff_dB.png'));
-%print(fig, fullfile(outFolder, 'FWM_conv_eff_dB.pdf'), '-dpdf');

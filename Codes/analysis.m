@@ -15,7 +15,7 @@ set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegend
 %-------------
 %%  LOAD DATA
 %-------------
-dataFolder = '../Tests/FWM_sweep_test_05';      % Test 01 irrelevant
+dataFolder = '../Tests/FWM_sweep_test_02';      % Test 01 irrelevant
 filePattern = fullfile(dataFolder, '*.csv');
 csvFiles = dir(filePattern);
 numFiles=length(csvFiles);
@@ -64,7 +64,7 @@ for k = 1:numFiles
     seedPower(k, 2) = maxSeedPower; 
     
     % Reject seed = pump
-    if abs(wl_seed - wl_pump) < 0.00112e-6
+    if abs(wl_seed - wl_pump) < 0.0015e-6%0.00112e-6
         genPower(k,1) = NaN;
         genPower(k,2) = NaN;
         continue;           
@@ -194,8 +194,21 @@ for i = 1:length(widths_to_test)
     w_idx = widths_to_test(i);
     
     % Load simulated eff index from .mat for THIS specific width
+    %Lambda_sim = simData.sTE.w(w_idx).o(1).lda;      
+    %neff_sim = real(simData.sTE.w(w_idx).o(1).neff); 
+
+
+    % Load simulated eff index from .mat for this specific width
     Lambda_sim = simData.sTE.w(w_idx).o(1).lda;      
-    neff_sim = real(simData.sTE.w(w_idx).o(1).neff); 
+    
+    % Extraemos el objeto matemático del Fit
+    fit_function = simData.sTE.w(w_idx).o(1).neff_fit;
+    
+    % Evaluamos la función pasándole las longitudes de onda, y le quitamos la parte imaginaria
+    neff_sim = real(fit_function(Lambda_sim));
+
+
+
     
     % Extract experimental wavelengths (in meters) to match arrays
     wl_idler_m = wl_idler_nm * 1e-9;
