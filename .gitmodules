@@ -1,0 +1,3 @@
+[submodule "balloon_qnet"]
+	path = balloon_qnet
+	url = https://github.com/consigliere0/balloon_qnet.git
