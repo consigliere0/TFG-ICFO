@@ -9,8 +9,13 @@ set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegend
 
 
 %% 4 waveguides different length
-power = [8.2, 4.8, 1.45, -2.53];
-length = [8800, 26235.508836, 43671.01763, 61106.526509] / 10000;
+% Chip 1.1
+% power = [8.2, 4.8, 1.45, -2.53];
+% length = [8800, 26235.508836, 43671.01763, 61106.526509] / 10000;
+
+% Chip 1.2
+power = [9.28, 5.10, 1.45];
+length = [8800, 26235.508836, 43671.01763] / 10000;
 
 fig1 = figure('Name', 'Prop loss', 'Position', [100, 100, 700, 500]);
 plot(length, power, 'xk', 'LineWidth', 1.5, 'MarkerSize',8);
@@ -27,10 +32,9 @@ m = p(1);
 n = p(2);
 disp('Linear fit values for propagation and coupling loss calculation:')
 fprintf('m = %.6g\nn = %.6g\n', m, n);
-disp()
 
 
 % Save results
 outFolder = '../Plots/Chip1';
 if ~exist(outFolder, 'dir'), mkdir(outFolder); end
-saveas(fig1, fullfile(outFolder, 'propagation_loss.png'));
+saveas(fig1, fullfile(outFolder, 'propagation_loss2.png'));
