@@ -64,7 +64,6 @@ FWM_sweep_test_06
 
 
 
-
 Pump_Sweep_01
 ??
 
@@ -72,3 +71,15 @@ Pump_Sweep_02
    Seed wvl = 1545nm
    Power 12.47 dBm
    Attenuator 1.00 dBm
+
+Chip13_wvg1/2_stimFWM_test_1(2)
+   Pump 17dBm, 1550.12nm
+   Power seed 12.47 dBm
+   Attenuator 1.00 dBm
+   Span 1500-1600nm, 0.5res, 200nm span
+
+Chip13_wvg1_stimFWM_test_3
+   Pump 17dBm, 1550.12nm
+   Power seed 12.47 dBm
+   Attenuator 1.00 dBm
+   Span 1515-1685nm, 0.5res, 100nm span

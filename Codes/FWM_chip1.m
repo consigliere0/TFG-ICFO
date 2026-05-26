@@ -17,7 +17,7 @@ set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegend
 %-------------
 %%  LOAD DATA
 %-------------
-dataFolder = '../Tests/Chip13_wvg2_stimFWM_test_1';
+dataFolder = '../Tests/Chip13_wvg6_stimFWM_test_1';
 filePattern = fullfile(dataFolder, '*.csv');
 csvFiles = dir(filePattern);
 numFiles=length(csvFiles);
@@ -36,14 +36,14 @@ end
 % ------------
 %% SINGLE PLOT
 % ------------
-for i = [1, 11, 30, 50, 51, 60, 80, 90, 100]
+for i = [1, 11, 30, 50, 51, 60]
     sanityCheck = sweepData{i};
     fig = figure(i);
     plot(sanityCheck(:,1), sanityCheck(:,2), 'Color', '#000000');
     xlabel('Wavelength'); ylabel('Power (dBm)');
     title(sprintf('Sweep Data for File %d', i));
     grid on;
-    outFolder = '../Tests/Chip13_wvg2_stimFWM_test_1';
+    outFolder = '../Tests/Chip13_wvg6_stimFWM_test_1';
     if ~exist(outFolder, 'dir'), mkdir(outFolder); end
     fname = fullfile(outFolder, sprintf('plot_single_%02d.png', i));
     saveas(fig, fname);
@@ -157,8 +157,9 @@ grid on;
 xlabel('Generated photon wavelength (nm)'); 
 ylabel('FWM Conversion Efficiency (dB)')
 title('FWM Conversion Efficiency')
+ylim([1480 1640]); ylim([-60 0]);
 
 % 4. Save (Make sure it saves to Test_06 folder, not Test_02)
-outFolder = '../Tests/Chip13_wvg2_stimFWM_test_1';
+outFolder = '../Tests/Chip13_wvg6_stimFWM_test_1';
 if ~exist(outFolder, 'dir'), mkdir(outFolder); end
 saveas(fig, fullfile(outFolder, 'FWM_conv_eff_dB.png'));
