@@ -54,12 +54,15 @@ end
 % ------------------------
 %% PEAK TRACKING PIPELINE
 % ------------------------
-
 % Physical constants
 c = 299792458;
-wl_pump = 1.5496e-06; % exp 1550.12nm, but checked graphs
-pump_window = 0.1e-9; %1.0e-9
-search_window = 0.5e-9;
+wl_pump = 1.5496e-06; 
+pump_window = 0.5e-9;       % Widened slightly for safety
+search_window = 1.0e-9;     % Widened to ensure we capture the whole peak
+
+% --- NEW: NOISE REJECTION SETTINGS ---
+snr_threshold = 5.0;        % The Idler must be at least 3 dB above the noise
+% -------------------------------------
 
 genPower = zeros(numFiles, 2);
 seedPower = zeros(numFiles, 2);
@@ -67,43 +70,66 @@ seedPower = zeros(numFiles, 2);
 for k = 1:numFiles
     x = sweepData{k}(:,1);
     y = sweepData{k}(:,2);
+    
+    % Auto Unit Conversion (Just in case the new chip data is in nm)
+    if mean(x) > 1000
+        x = x * 1e-9;
+    end
 
     % Find seed position. We ignore pump region.
     not_pump = (x < (wl_pump - pump_window)) | (x > (wl_pump + pump_window));
     x_noPump = x(not_pump);
     y_noPump = y(not_pump);
-
-    % Max oustide region = seed
+    
+    % Max outside region = seed
     [maxSeedPower, seedIdx] = max(y_noPump);
     wl_seed = x_noPump(seedIdx);
-    seedPower(k, 1) = wl_seed; % Corresponding wavelength for seed
-    seedPower(k, 2) = maxSeedPower; % Max seed power
-
+    seedPower(k, 1) = wl_seed; 
+    seedPower(k, 2) = maxSeedPower; 
+    
     % Reject seed = pump
-    if abs(wl_seed - wl_pump) < 8.8e-10 %0.001e-6%0.00112e-6%8.8e-10     % 8.8e-10 exact
+    if abs(wl_seed - wl_pump) < 0.0015e-6
         genPower(k,1) = NaN;
         genPower(k,2) = NaN;
-        continue;           % maybe include wvl?
+        continue;           
     end
-
+    
     % Calculate idler theoretical position
-    w_pump = c / wl_pump; w_seed = c / wl_seed;
+    w_pump = c / wl_pump; 
+    w_seed = c / wl_seed;
     w_idler = 2*w_pump - w_seed;
     wl_idlerTheo = c / w_idler;
-
-    % Dynamic window arround theo value
+    
+    % Dynamic window around theoretical value
     int = (x >= (wl_idlerTheo - search_window)) & (x <= (wl_idlerTheo + search_window));
+    
     if any(int)
+        % 1. Find the absolute maximum in the window (Potential Idler)
         [maxY, relIdx] = max(y(int));
-        idx = find(int);
-        genPower(k, 1) = x(idx(relIdx)); % Corresponding wavelength for generated power
-        genPower(k, 2) = maxY; % Max generated power
+        
+        % 2. Calculate the local noise floor
+        % We take the median of the Y-values in the window. 
+        % Median is robust against the peak itself.
+        local_noise_floor = median(y(int)); 
+        
+        % 3. Check Signal-to-Noise Ratio (SNR)
+        if (maxY - local_noise_floor) >= snr_threshold
+            % It is a real peak!
+            idx = find(int);
+            genPower(k, 1) = x(idx(relIdx)); 
+            genPower(k, 2) = maxY; 
+        else
+            % It is just noise. Reject it.
+            genPower(k, 1) = NaN;
+            genPower(k, 2) = NaN;
+        end
     else
         genPower(k, 1) = NaN;
         genPower(k, 2) = NaN;
     end
 end
-%genPower(11,:) = []; seedPower(11,:) = [];
+
+
 
 % -------------------
 %% FWM VISUALIZATION
