@@ -15,7 +15,7 @@ set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegend
 %-------------
 %%  LOAD DATA
 %-------------
-dataFolder = '../Tests/seedSweep_noChip';
+dataFolder = '../Tests/Chip13_wvg5_TMstimFWM_test_2';
 filePattern = fullfile(dataFolder, '*.csv');
 csvFiles = dir(filePattern);
 numFiles = length(csvFiles);
@@ -47,10 +47,10 @@ end
 c = 299792458;
 wl_pump = 1.5496e-06;
 pump_window = 0.5e-9;
-search_window = 1.0e-9;
+search_window = 1.0e-9
 
 % --- Thresholds ---
-snr_threshold = 3.4;          % lowered from 20: real but weak peaks were being missed
+snr_threshold = 3;          % lowered from 20: real but weak peaks were being missed
 OSA_floor     = -80;        % dBm: OSA fill value for out-of-range bins, must be excluded
 
 % --- Debug: visualize noise window for these file indices ---
@@ -241,7 +241,7 @@ title('Normalized FWM Efficiency ($\eta_{norm}$)');
 ylim([0 100])
 
 % 5. Save
-outFolder = '../Tests/seedSweep_noChip';
+outFolder = '../Tests/Chip13_wvg5_TMstimFWM_test_2';
 if ~exist(outFolder, 'dir'), mkdir(outFolder); end
 saveas(fig, fullfile(outFolder, 'Norm_ce.png'));
 
