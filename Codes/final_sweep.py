@@ -6,7 +6,7 @@ import os
 def run_fwm_sweep():
     rm = pyvisa.ResourceManager()
 
-    new_folder = "seedSweep_noChip"
+    new_folder = "Chip13_wvg5_TEstimFWM_test_1"
     os.makedirs(new_folder, exist_ok=True)  
 
     santec_ip = "192.168.1.100"
