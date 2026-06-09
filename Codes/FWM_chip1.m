@@ -15,7 +15,7 @@ set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegend
 %-------------
 %%  LOAD DATA
 %-------------
-dataFolder = '../Tests/Chip13_wvg5_TMstimFWM_test_2';
+dataFolder = '../Tests/stimFWM/wvg1_TE1';
 filePattern = fullfile(dataFolder, '*.csv');
 csvFiles = dir(filePattern);
 numFiles = length(csvFiles);
@@ -241,7 +241,7 @@ title('Normalized FWM Efficiency ($\eta_{norm}$)');
 ylim([0 100])
 
 % 5. Save
-outFolder = '../Tests/Chip13_wvg5_TMstimFWM_test_2';
+outFolder = '../Tests/stimFWM/wvg1_TE1';
 if ~exist(outFolder, 'dir'), mkdir(outFolder); end
 saveas(fig, fullfile(outFolder, 'Norm_ce.png'));
 
