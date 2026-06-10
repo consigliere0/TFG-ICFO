@@ -6,7 +6,7 @@ import os
 def run_fwm_sweep():
     rm = pyvisa.ResourceManager()
 
-    new_folder = "wvg4_TM1"
+    new_folder = "wvg6_TM1"
     os.makedirs(new_folder, exist_ok=True)  
 
     santec_ip = "192.168.1.100"
