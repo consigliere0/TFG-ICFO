@@ -27,7 +27,7 @@ set(groot, 'defaultLegendInterpreter','latex');
 % =========================================================================
 %% SECCIÓ 2: CÀRREGA DE DADES (Load Data)
 % =========================================================================
-dataFolder = '../Tests/stimFWM/wvg2_TE1';
+dataFolder = '../Tests/stimFWM/wvg2_TM1';
 filePattern = fullfile(dataFolder, '*.csv');
 csvFiles = dir(filePattern);
 numFiles = length(csvFiles);
