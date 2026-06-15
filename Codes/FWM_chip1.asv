@@ -27,7 +27,7 @@ set(groot, 'defaultLegendInterpreter','latex');
 % =========================================================================
 %% SECCIÓ 2: CÀRREGA DE DADES (Load Data)
 % =========================================================================
-dataFolder = '../Tests/stimFWM/wvg6_TM1';
+dataFolder = '../Tests/stimFWM/wvg2_TM1';
 filePattern = fullfile(dataFolder, '*.csv');
 csvFiles = dir(filePattern);
 numFiles = length(csvFiles);
@@ -45,17 +45,17 @@ end
 outFolder = dataFolder; % Guardem a la mateixa carpeta
 if ~exist(outFolder, 'dir'), mkdir(outFolder); end
 
-for i = [1, 2, 3, 4, 5, 6, 8, 9, 10, 15, 20, 30, 35, 40, 50, 70, 72, 75, 80, 85, 90, 95, 100, 110, 120, 130, 135, 140, 146]
-    sanityCheck = sweepData{i};
-    fig = figure(i);
-    plot(sanityCheck(:,1), sanityCheck(:,2), 'Color', '#000000');
-    xlabel('Wavelength'); ylabel('Power (dBm)');
-    title(sprintf('Sweep Data for File %d', i));
-    grid on;
-
-    fname = fullfile(outFolder, sprintf('plot_single_%02d.png', i));
-    saveas(fig, fname);
-end
+% for i = [1, 2, 3, 4, 5, 6, 8, 9, 10, 15, 20, 30, 35, 40, 50, 70, 72, 75, 80, 85, 90, 95, 100, 110, 120, 130, 135, 140, 146]
+%     sanityCheck = sweepData{i};
+%     fig = figure(i);
+%     plot(sanityCheck(:,1), sanityCheck(:,2), 'Color', '#000000');
+%     xlabel('Wavelength'); ylabel('Power (dBm)');
+%     title(sprintf('Sweep Data for File %d', i));
+%     grid on;
+% 
+%     fname = fullfile(outFolder, sprintf('plot_single_%02d.png', i));
+%     saveas(fig, fname);
+% end
 % close all; % Tanquem els single plots per no saturar la memòria
 
 % =========================================================================
@@ -68,7 +68,7 @@ pump_window = 0.5e-9;
 search_window = 1.0e-9;
 
 % --- Llindars de Soroll (Thresholds) ---
-snr_threshold = 3.2;        
+snr_threshold = 2;        
 OSA_floor     = -80;        
 
 % --- Inicialització de matrius ---
@@ -245,21 +245,21 @@ subset_files = [1, 2, 3, 4, 5, 6, 8, 9, 10, 15, 20, 30, 35, 40, 50, 70, 72, 75, 
 colors = parula(length(subset_files)); 
 
 % --- 10A: OVERLAY AMB ELS SEEDS (Cru) ---
-% fig_overlay_raw = figure('Name', 'Spectra Overlay (With Seeds)', 'Position', [100, 100, 900, 500]);
-% hold on;
-% for j = 1:length(subset_files)
-%     idx = subset_files(j);
-%     if idx <= numFiles
-%         x_nm = sweepData{idx}(:,1);
-%         if mean(x_nm) < 1000, x_nm = x_nm * 1e9; end
-%         plot(x_nm, sweepData{idx}(:,2), 'Color', colors(j,:), 'LineWidth', 1);
-%     end
-% end
-% xline(wl_pump*1e9, '--r', 'LineWidth', 2, 'Label', 'Pump', 'LabelOrientation', 'horizontal');
-% xlabel('Wavelength (nm)'); ylabel('Power (dBm)');
-% title('Evolution of FWM Spectra (Raw with Seed)');
-% grid on; hold off;
-% saveas(fig_overlay_raw, fullfile(outFolder, 'Spectra_Overlay_Raw.png'));
+fig_overlay_raw = figure('Name', 'Spectra Overlay (With Seeds)', 'Position', [100, 100, 900, 500]);
+hold on;
+for j = 1:length(subset_files)
+    idx = subset_files(j);
+    if idx <= numFiles
+        x_nm = sweepData{idx}(:,1);
+        if mean(x_nm) < 1000, x_nm = x_nm * 1e9; end
+        plot(x_nm, sweepData{idx}(:,2), 'Color', colors(j,:), 'LineWidth', 1);
+    end
+end
+xline(wl_pump*1e9, '--r', 'LineWidth', 2, 'Label', 'Pump', 'LabelOrientation', 'horizontal');
+xlabel('Wavelength (nm)'); ylabel('Power (dBm)');
+title('Evolution of FWM Spectra (Raw with Seed)');
+grid on; hold off;
+saveas(fig_overlay_raw, fullfile(outFolder, 'Spectra_Overlay_Raw.png'));
 
 % --- 10B: OVERLAY SENSE ELS SEEDS (Net, estil paper científic) ---
 fig_overlay_clean = figure('Name', 'Spectra Overlay', 'Position', [150, 150, 900, 500]);
@@ -283,6 +283,6 @@ for j = 1:length(subset_files)
 end
 xline(wl_pump*1e9, '--r', 'LineWidth', 2, 'Label', 'Pump', 'LabelOrientation', 'horizontal');
 xlabel('Wavelength (nm)'); ylabel('Power (dBm)');
-title('Evolution of Generated Signal Spectra');
+title('Evolution of Generated Signal Spectra (Clean)');
 grid on; ylim([-90 -20]); hold off;
 saveas(fig_overlay_clean, fullfile(outFolder, 'Spectra_Overlay_Clean.png'));
