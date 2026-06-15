@@ -27,7 +27,7 @@ set(groot, 'defaultLegendInterpreter','latex');
 % =========================================================================
 %% SECCIÓ 2: CÀRREGA DE DADES (Load Data)
 % =========================================================================
-dataFolder = '../Tests/stimFWM/wvg6_TM1';
+dataFolder = '../Tests/stimFWM/wvg2_TE1';
 filePattern = fullfile(dataFolder, '*.csv');
 csvFiles = dir(filePattern);
 numFiles = length(csvFiles);
@@ -44,18 +44,18 @@ end
 % =========================================================================
 outFolder = dataFolder; % Guardem a la mateixa carpeta
 if ~exist(outFolder, 'dir'), mkdir(outFolder); end
-
-for i = [1, 2, 3, 4, 5, 6, 8, 9, 10, 15, 20, 30, 35, 40, 50, 70, 72, 75, 80, 85, 90, 95, 100, 110, 120, 130, 135, 140, 146]
-    sanityCheck = sweepData{i};
-    fig = figure(i);
-    plot(sanityCheck(:,1), sanityCheck(:,2), 'Color', '#000000');
-    xlabel('Wavelength'); ylabel('Power (dBm)');
-    title(sprintf('Sweep Data for File %d', i));
-    grid on;
-
-    fname = fullfile(outFolder, sprintf('plot_single_%02d.png', i));
-    saveas(fig, fname);
-end
+% 
+% for i = [1, 2, 3, 4, 5, 6, 8, 9, 10, 15, 20, 30, 35, 40, 50, 70, 72, 75, 80, 85, 90, 95, 100, 110, 120, 130, 135, 140, 146]
+%     sanityCheck = sweepData{i};
+%     fig = figure(i);
+%     plot(sanityCheck(:,1), sanityCheck(:,2), 'Color', '#000000');
+%     xlabel('Wavelength'); ylabel('Power (dBm)');
+%     title(sprintf('Sweep Data for File %d', i));
+%     grid on;
+% 
+%     fname = fullfile(outFolder, sprintf('plot_single_%02d.png', i));
+%     saveas(fig, fname);
+% end
 % close all; % Tanquem els single plots per no saturar la memòria
 
 % =========================================================================
