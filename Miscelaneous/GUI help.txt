@@ -1,0 +1,27 @@
+Coincidences / conda GUI
+
+	2.3 Activate the new conda environment by running the following command:
+		conda activate GUI_swabianTT-PAM
+
+3. You can now run the GUI using the following command:
+	python ./GUI.py
+
+------------------------------------------------------------
+
+OPENING THE GUI
+
+To open the GUI, always run the following steps:
+
+1. Open a Powershell window (if you have Anaconda, open "Anaconda powershell"):
+	
+2. Go to the folder where this file is located, by running the command:
+	cd "{path_to_current_folder}"
+	e.g.
+	cd ".\quantum_lab_tools\GUI_swabianTT_standaRotation\version2025.0_minReqs"
+
+3. Activate conda environment for the GUI:
+	conda activate GUI_swabianTT-PAM
+
+4. You can now run the GUI using the following command:
+	python ./GUI.py
+------------------------------------------------------------
