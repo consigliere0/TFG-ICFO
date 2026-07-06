@@ -1,0 +1,138 @@
+% =========================================================================
+%% TFG - COINCIDENCE COUNTS & CAR DATA PROCESSING
+% =========================================================================
+% ÍNDEX DEL CODI:
+%  
+% =========================================================================
+
+% =========================================================================
+%%                     SECTION 1: INITIAL SETTINGS
+% =========================================================================
+clear; close all; format long g
+s = settings;
+s.matlab.appearance.figure.GraphicsTheme.TemporaryValue = "light";
+set(groot, 'defaultTextInterpreter', 'latex')
+set(groot, 'defaultAxesTickLabelInterpreter','latex'); 
+set(groot, 'defaultLegendInterpreter','latex');
+
+
+% Coincidence window = 1000 ps = 1e-9 seconds (from file header)
+tau = 1000 * 1e-12; 
+
+% =========================================================================
+%% SECTION 2: LOAD DATA
+% =========================================================================
+files = dir('*2026-*'); % Looks for files containing the date prefix
+
+% Initialize arrays to store results
+powers_TE = []; trueCC_TE = []; car_TE = [];
+powers_TM = []; trueCC_TM = []; car_TM = [];
+
+disp('Processing data files...');
+
+for i = 1:length(files)
+    fname = files(i).name;
+    
+    % Read the data. NumHeaderLines=8 skips the '#' comments.
+    % The 9th line is the column names, 10th line onwards is data.
+    try
+        data = readtable(fname, 'FileType', 'text', 'NumHeaderLines', 8);
+    catch
+        warning('Could not read file: %s', fname);
+        continue;
+    end
+   
+    % =========================================================================
+    %% SECTION 3: MAGNITUDE CALCULATION
+    % =========================================================================
+    % Extract mean values across the 50 data points in the file
+    % Col 3: Singles CH1 | Col 4: Singles CH2 | Col 8: Coinc1
+    CH1_mean = mean(data{:, 3}, 'omitnan');
+    CH2_mean = mean(data{:, 4}, 'omitnan');
+    Coinc_raw_mean = mean(data{:, 8}, 'omitnan');
+    
+    % Magnitudes calculations
+    accidentals = CH1_mean * CH2_mean * tau;
+    true_coincidences = Coinc_raw_mean - accidentals;
+    CAR = true_coincidences / accidentals; 
+    
+    % --- Identify Polarization and Power from Filename ---
+    % Regex to find 'TE_' or 'TM_' followed by digits
+    token_TE = regexp(fname, 'TE_(\d+)', 'tokens');
+    token_TM = regexp(fname, 'TM_(\d+)', 'tokens');
+    
+    if ~isempty(token_TE)
+        % Convert "1356" to 13.56
+        power = str2double(token_TE{1}{1}) / 100;
+        powers_TE(end+1) = power;
+        trueCC_TE(end+1) = true_coincidences;
+        car_TE(end+1) = CAR;
+    elseif ~isempty(token_TM)
+        power = str2double(token_TM{1}{1}) / 100;
+        powers_TM(end+1) = power;
+        trueCC_TM(end+1) = true_coincidences;
+        car_TM(end+1) = CAR;
+    end
+end
+
+% =========================================================================
+%% SECTION 4: PLOTTING
+% =========================================================================
+% Sort the data arrays by Power (ascending) for proper plotting
+[powers_TE, sortIdx_TE] = sort(powers_TE);
+trueCC_TE = trueCC_TE(sortIdx_TE);
+car_TE = car_TE(sortIdx_TE);
+
+[powers_TM, sortIdx_TM] = sort(powers_TM);
+trueCC_TM = trueCC_TM(sortIdx_TM);
+car_TM = car_TM(sortIdx_TM);
+
+disp('Data successfully processed. Generating plots...');
+
+%% --- PLOT 1: True Coincidences vs Power (Quadratic Fit) ---
+figure('Name', 'True Coincidences vs Power', 'Color', 'w');
+hold on; box on; grid on;
+
+% Plot Raw Data Points
+scatter(powers_TE, trueCC_TE, 80, 'b', 'filled', 'DisplayName', 'TE Measurement');
+scatter(powers_TM, trueCC_TM, 80, 'r', 'filled', 'DisplayName', 'TM Measurement');
+
+% Function for quadratic fit: ax^2 + bx + c
+fit_eqn = fittype('a*x^2 + b*x + c');
+fit_options = fitoptions('Method', 'NonlinearLeastSquares');
+
+% TE Fit
+if length(powers_TE) >= 3
+    [fit_TE, gof_TE] = fit(powers_TE', trueCC_TE', fit_eqn, fit_options);
+    x_TE_fit = linspace(min(powers_TE), max(powers_TE), 100);
+    plot(x_TE_fit, fit_TE(x_TE_fit), 'b-', 'LineWidth', 1.5, ...
+        'DisplayName', sprintf('TE Fit: a=%.3f, b=%.3f', fit_TE.a, fit_TE.b));
+end
+
+% TM Fit
+if length(powers_TM) >= 3
+    [fit_TM, gof_TM] = fit(powers_TM', trueCC_TM', fit_eqn, fit_options);
+    x_TM_fit = linspace(min(powers_TM), max(powers_TM), 100);
+    plot(x_TM_fit, fit_TM(x_TM_fit), 'r-', 'LineWidth', 1.5, ...
+        'DisplayName', sprintf('TM Fit: a=%.3f, b=%.3f', fit_TM.a, fit_TM.b));
+end
+
+xlabel('Laser Power (mW)', 'FontSize', 12, 'FontWeight', 'bold');
+ylabel('True Coincidences (cps)', 'FontSize', 12, 'FontWeight', 'bold');
+title('SFWM True Coincidences vs Laser Power', 'FontSize', 14);
+legend('Location', 'northwest', 'FontSize', 11);
+set(gca, 'FontSize', 11);
+
+%% --- PLOT 2: CAR vs Power ---
+figure('Name', 'CAR vs Power', 'Color', 'w');
+hold on; box on; grid on;
+
+% Plot CAR with connected lines to show the trend
+plot(powers_TE, car_TE, '-ob', 'LineWidth', 1.5, 'MarkerSize', 8, 'MarkerFaceColor', 'b', 'DisplayName', 'TE Polarization');
+plot(powers_TM, car_TM, '-or', 'LineWidth', 1.5, 'MarkerSize', 8, 'MarkerFaceColor', 'r', 'DisplayName', 'TM Polarization');
+
+xlabel('Laser Power (mW)', 'FontSize', 12, 'FontWeight', 'bold');
+ylabel('CAR (Coincidences / Accidentals)', 'FontSize', 12, 'FontWeight', 'bold');
+title('Coincidence-to-Accidental Ratio (CAR) vs Power', 'FontSize', 14);
+legend('Location', 'northeast', 'FontSize', 11);
+set(gca, 'FontSize', 11);
