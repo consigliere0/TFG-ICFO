@@ -3,3 +3,6 @@ C:\Users\Public\Documents\Project\Pure-Photonics-GUI-2025.05.19\Pure Photonics G
 
 Lab PC repo path:
 C:\Users\lgonzalez\Documents\TFG\TFG-ICFO
+
+Coincidences GUI
+C:\Users\lgonzalez\Desktop\quantum_lab_tools\GUI_swabianTT_standaRotation\version2025.0_minReqs
