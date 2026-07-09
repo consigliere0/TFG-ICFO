@@ -1,5 +1,5 @@
 # Parameters
-# Channel (CH) 1: Alias=CH1, input delay=10200 ps, trigger level= 0.5V
+# Channel (CH) 1: Alias=CH1, input delay=-10000 ps, trigger level= 0.5V
 # Channel (CH) 2: Alias=CH2, input delay=0 ps, trigger level= 0.5V
 # Channel (CH) 3: Alias=CH3, input delay=0 ps, trigger level= 0.5V
 # Channel (CH) 4: Alias=CH4, input delay=0 ps, trigger level= 0.5V
@@ -8,4 +8,4 @@
 # Rotation Mount (RM) 1: Alias=RM1, Typ=virtual, S/N=Virt0, fast axis= 0.0 deg
 # Rotation Mount (RM) 2: Alias=RM2, Typ=virtual, S/N=Virt1, fast axis= 0.0 deg
 Nr., timestamp, Singles CH1, Singles CH2, Singles CH3, Singles CH4, Singles CH5, Coinc1, angle /deg RM1, angle /deg RM2
-0, 2026-07-03_15-52-29, 50634.3, 65663.95, 0.0, 0.0, 0.0, 7.2, 0, 0
+0, 2026-07-07_16-26-27, 98401.01666666666, 148749.21666666667, 0.0, 0.0, 0.0, 68.61666666666666, 0, 0
