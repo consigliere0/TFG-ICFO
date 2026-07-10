@@ -24,12 +24,16 @@ tau = 1000 * 1e-12;
 % =========================================================================
 %% SECTION 2: LOAD DATA & MANUAL POWER MAPPING
 % =========================================================================
-data_path = '../Tests/timetagger/wvg2/data4/TE/';
+data_path = '../Tests/timetagger/wvg2/data5/';
 files     = dir(fullfile(data_path, '*2026-*'));
 
-manual_powers_TE_dBm = [-4.8, -3.31, -2.83, -2.5, -0.52, -1.5, -2.22, -2.92, -4.42];
-manual_powers_TM_dBm = [2.48, 1.18, 0.48, -0.12, -0.82, -1.62, -2.12, -2.82, -3.82, -4.82, -5.82]; % [-1, 3] dBm
+% data4
+%manual_powers_TE_dBm = [-4.8, -3.31, -2.83, -2.5, -0.52, -1.5, -2.22, -2.92, -4.42];
+%manual_powers_TM_dBm = [2.48, 1.18, 0.48, -0.12, -0.82, -1.62, -2.12, -2.82, -3.82, -4.82, -5.82]; % [-1, 3] dBm
 
+% data5
+manual_powers_TE_dBm = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+manual_powers_TM_dBm = [0, 1];
 powers_TE_dBm = []; powers_TM_dBm = [];
 
 rawCC_TE = []; rawCC_TE_std = []; acc_TE = []; acc_TE_std = [];
