@@ -1,12 +1,3 @@
-%% TO DO
-% If only one measurement, remove eror bar
-% Check in brightness with quadratic (dBm) or linear (mW) fit
-
-
-
-
-
-
 % =========================================================================
 %% TFG - COINCIDENCE COUNTS & CAR DATA PROCESSING
 % =========================================================================
@@ -27,20 +18,13 @@ tau = 1000 * 1e-12;
 data_path = '../Tests/timetagger/wvg2/data5/';
 files     = dir(fullfile(data_path, '*2026-*'));
 
-% data4
-%manual_powers_TE_dBm = [-4.8, -3.31, -2.83, -2.5, -0.52, -1.5, -2.22, -2.92, -4.42];
-%manual_powers_TM_dBm = [2.48, 1.18, 0.48, -0.12, -0.82, -1.62, -2.12, -2.82, -3.82, -4.82, -5.82]; % [-1, 3] dBm
+manual_powers_TE_dBm = [-21.84, -18.74, -16.74, -14.84, -12.94, -11.04, -8.94, -6.74, -4.94, -2.84, -0.44, 1.66, 3.66, 5.86, 7.86, 10.16, 11.66];
+manual_powers_TM_dBm = [-22.64, -19.84, -17.14, -15.24, -13.04, -11.14, -9.14, -7.14, -5.04, -3.14, -1.04, 0.76, 2.76, 4.56, 6.56, 8.46, 10.46, 11.36];
 
-% data5
-manual_powers_TE_dBm = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
-manual_powers_TM_dBm = [0, 1];
 powers_TE_dBm = []; powers_TM_dBm = [];
 
-rawCC_TE = []; rawCC_TE_std = []; acc_TE = []; acc_TE_std = [];
-trueCC_TE = []; trueCC_TE_std = []; car_TE = []; car_TE_std = [];
-
-rawCC_TM = []; rawCC_TM_std = []; acc_TM = []; acc_TM_std = [];
-trueCC_TM = []; trueCC_TM_std = []; car_TM = []; car_TM_std = [];
+rawCC_TE  = []; acc_TE  = []; trueCC_TE = []; car_TE = [];
+rawCC_TM  = []; acc_TM  = []; trueCC_TM = []; car_TM = [];
 
 disp('Processing data files...');
 
@@ -69,49 +53,36 @@ for i = 1:length(files)
     % =====================================================================
     %% SECTION 3: MAGNITUDE CALCULATION
     % =====================================================================
-    CH1_vec   = data{:, 3};
-    CH2_vec   = data{:, 4};
-    Coinc_vec = data{:, 8};
+    % Single datapoint per file — read the one value directly, no mean/std needed
+    CH1_val   = data{1, 3};
+    CH2_val   = data{1, 4};
+    Coinc_val = data{1, 8};
 
-    CH1_mean       = mean(CH1_vec,   'omitnan');
-    CH2_mean       = mean(CH2_vec,   'omitnan');
-    Coinc_raw_mean = mean(Coinc_vec, 'omitnan');
-
-    CH1_std       = std(CH1_vec,   0, 'omitnan');
-    CH2_std       = std(CH2_vec,   0, 'omitnan');
-    Coinc_raw_std = std(Coinc_vec, 0, 'omitnan');
-
-    accidentals     = CH1_mean * CH2_mean * tau;
-    accidentals_std = sqrt((CH2_mean*tau*CH1_std)^2 + (CH1_mean*tau*CH2_std)^2);
-
-    true_coincidences     = Coinc_raw_mean - accidentals;
-    true_coincidences_std = sqrt(Coinc_raw_std^2 + accidentals_std^2);
-
-    CAR     = true_coincidences / accidentals;
-    CAR_std = abs(CAR) * sqrt((true_coincidences_std/true_coincidences)^2 + ...
-                               (accidentals_std/accidentals)^2);
+    accidentals       = CH1_val * CH2_val * tau;
+    true_coincidences = Coinc_val - accidentals;
+    CAR               = true_coincidences / accidentals;
 
     if ~isempty(token_TE)
         file_idx  = str2double(token_TE{1}{1});
         power_dBm = manual_powers_TE_dBm(file_idx + 1);
-        powers_TE_dBm(end+1)    = power_dBm;
-        rawCC_TE(end+1)         = Coinc_raw_mean; rawCC_TE_std(end+1)   = Coinc_raw_std;
-        acc_TE(end+1)           = accidentals;    acc_TE_std(end+1)     = accidentals_std;
-        trueCC_TE(end+1)        = true_coincidences; trueCC_TE_std(end+1) = true_coincidences_std;
-        car_TE(end+1)           = CAR;            car_TE_std(end+1)     = CAR_std;
+        powers_TE_dBm(end+1) = power_dBm;
+        rawCC_TE(end+1)      = Coinc_val;
+        acc_TE(end+1)        = accidentals;
+        trueCC_TE(end+1)     = true_coincidences;
+        car_TE(end+1)        = CAR;
         fprintf('TE: %s | Idx %d | %.2f dBm | Raw=%.2f | Acc=%.4f | True=%.2f | CAR=%.2f\n', ...
-            fname, file_idx, power_dBm, Coinc_raw_mean, accidentals, true_coincidences, CAR);
+            fname, file_idx, power_dBm, Coinc_val, accidentals, true_coincidences, CAR);
 
     elseif ~isempty(token_TM)
         file_idx  = str2double(token_TM{1}{1});
         power_dBm = manual_powers_TM_dBm(file_idx + 1);
-        powers_TM_dBm(end+1)    = power_dBm;
-        rawCC_TM(end+1)         = Coinc_raw_mean; rawCC_TM_std(end+1)   = Coinc_raw_std;
-        acc_TM(end+1)           = accidentals;    acc_TM_std(end+1)     = accidentals_std;
-        trueCC_TM(end+1)        = true_coincidences; trueCC_TM_std(end+1) = true_coincidences_std;
-        car_TM(end+1)           = CAR;            car_TM_std(end+1)     = CAR_std;
+        powers_TM_dBm(end+1) = power_dBm;
+        rawCC_TM(end+1)      = Coinc_val;
+        acc_TM(end+1)        = accidentals;
+        trueCC_TM(end+1)     = true_coincidences;
+        car_TM(end+1)        = CAR;
         fprintf('TM: %s | Idx %d | %.2f dBm | Raw=%.2f | Acc=%.4f | True=%.2f | CAR=%.2f\n', ...
-            fname, file_idx, power_dBm, Coinc_raw_mean, accidentals, true_coincidences, CAR);
+            fname, file_idx, power_dBm, Coinc_val, accidentals, true_coincidences, CAR);
     end
 end
 
@@ -121,18 +92,17 @@ fprintf('\nFiles parsed: %d TE, %d TM\n', length(powers_TE_dBm), length(powers_T
 %% SECTION 4: SORT
 % =========================================================================
 [powers_TE_dBm, sIdx_TE] = sort(powers_TE_dBm);
-rawCC_TE  = rawCC_TE(sIdx_TE);  rawCC_TE_std  = rawCC_TE_std(sIdx_TE);
-acc_TE    = acc_TE(sIdx_TE);    acc_TE_std    = acc_TE_std(sIdx_TE);
-trueCC_TE = trueCC_TE(sIdx_TE); trueCC_TE_std = trueCC_TE_std(sIdx_TE);
-car_TE    = car_TE(sIdx_TE);    car_TE_std    = car_TE_std(sIdx_TE);
+rawCC_TE  = rawCC_TE(sIdx_TE);
+acc_TE    = acc_TE(sIdx_TE);
+trueCC_TE = trueCC_TE(sIdx_TE);
+car_TE    = car_TE(sIdx_TE);
 
 [powers_TM_dBm, sIdx_TM] = sort(powers_TM_dBm);
-rawCC_TM  = rawCC_TM(sIdx_TM);  rawCC_TM_std  = rawCC_TM_std(sIdx_TM);
-acc_TM    = acc_TM(sIdx_TM);    acc_TM_std    = acc_TM_std(sIdx_TM);
-trueCC_TM = trueCC_TM(sIdx_TM); trueCC_TM_std = trueCC_TM_std(sIdx_TM);
-car_TM    = car_TM(sIdx_TM);    car_TM_std    = car_TM_std(sIdx_TM);
+rawCC_TM  = rawCC_TM(sIdx_TM);
+acc_TM    = acc_TM(sIdx_TM);
+trueCC_TM = trueCC_TM(sIdx_TM);
+car_TM    = car_TM(sIdx_TM);
 
-% dBm -> mW for the mW subplots
 powers_TE_mW = 10.^(powers_TE_dBm / 10);
 powers_TM_mW = 10.^(powers_TM_dBm / 10);
 
@@ -161,18 +131,15 @@ fit_options = fitoptions('Method', 'NonlinearLeastSquares', 'StartPoint', [1, 1,
 
 figure('Name', 'All Coincidences vs Power', 'Color', 'w', 'Position', [80 120 1400 520]);
 
-% ---- helper: draws all six series + acc fits onto the current axes ----
-% (defined as a nested function block executed twice, once per subplot)
-
 for subplot_idx = 1:2
     if subplot_idx == 1
-        ax = subplot(1, 2, 1);
+        ax    = subplot(1, 2, 1);
         px_TE = powers_TE_dBm;
         px_TM = powers_TM_dBm;
         xlab  = 'Pump Power (dBm)';
         tstr  = 'Coincidence Rates vs Pump Power (dBm)';
     else
-        ax = subplot(1, 2, 2);
+        ax    = subplot(1, 2, 2);
         px_TE = powers_TE_mW;
         px_TM = powers_TM_mW;
         xlab  = 'Pump Power (mW)';
@@ -181,52 +148,46 @@ for subplot_idx = 1:2
 
     hold(ax, 'on'); box(ax, 'on'); grid(ax, 'on'); grid(ax, 'minor');
 
-    % ---- RAW CC ----
-    errorbar(ax, px_TE, rawCC_TE, rawCC_TE_std, 'o', ...
-        'Color', c_raw_data, 'MarkerFaceColor', c_raw_data, 'MarkerSize', 7, ...
-        'LineWidth', 1.2, 'CapSize', 5, 'LineStyle', 'none', ...
-        'DisplayName', 'TE Raw CC');
-    errorbar(ax, px_TM, rawCC_TM, rawCC_TM_std, 's', ...
-        'Color', c_raw_data, 'MarkerFaceColor', c_raw_data, 'MarkerSize', 7, ...
-        'LineWidth', 1.2, 'CapSize', 5, 'LineStyle', 'none', ...
-        'DisplayName', 'TM Raw CC');
+    % % ---- RAW CC ----
+    % plot(ax, px_TE, rawCC_TE, 'o', ...
+    %     'Color', c_raw_data, 'MarkerFaceColor', c_raw_data, 'MarkerSize', 7, ...
+    %     'LineWidth', 1.2, 'LineStyle', 'none', 'DisplayName', 'TE Raw CC');
+    % plot(ax, px_TM, rawCC_TM, 's', ...
+    %     'Color', c_raw_data, 'MarkerFaceColor', c_raw_data, 'MarkerSize', 7, ...
+    %     'LineWidth', 1.2, 'LineStyle', 'none', 'DisplayName', 'TM Raw CC');
 
     % ---- ACCIDENTALS ----
-    errorbar(ax, px_TE, acc_TE, acc_TE_std, 'o', ...
+    plot(ax, px_TE, acc_TE, 'o', ...
         'Color', c_acc_data, 'MarkerFaceColor', c_acc_data, 'MarkerSize', 7, ...
-        'LineWidth', 1.2, 'CapSize', 5, 'LineStyle', 'none', ...
-        'DisplayName', 'TE Accidentals');
-    errorbar(ax, px_TM, acc_TM, acc_TM_std, 's', ...
+        'LineWidth', 1.2, 'LineStyle', 'none', 'DisplayName', 'TE Accidentals');
+    plot(ax, px_TM, acc_TM, 's', ...
         'Color', c_acc_data, 'MarkerFaceColor', c_acc_data, 'MarkerSize', 7, ...
-        'LineWidth', 1.2, 'CapSize', 5, 'LineStyle', 'none', ...
-        'DisplayName', 'TM Accidentals');
+        'LineWidth', 1.2, 'LineStyle', 'none', 'DisplayName', 'TM Accidentals');
 
-    if length(px_TE) >= 3
-        [f, ~] = fit(px_TE', acc_TE', fit_eqn, fit_options);
-        xf = linspace(min(px_TE), max(px_TE), 200);
-        plot(ax, xf, f(xf), '-', 'Color', c_acc_fit, 'LineWidth', 2.0, ...
-            'DisplayName', 'TE Acc fit');
-    end
-    if length(px_TM) >= 3
-        [f, ~] = fit(px_TM', acc_TM', fit_eqn, fit_options);
-        xf = linspace(min(px_TM), max(px_TM), 200);
-        plot(ax, xf, f(xf), '--', 'Color', c_acc_fit, 'LineWidth', 2.0, ...
-            'DisplayName', 'TM Acc fit');
-    end
+    % if length(px_TE) >= 3
+    %     [f, ~] = fit(px_TE', acc_TE', fit_eqn, fit_options);
+    %     xf = linspace(min(px_TE), max(px_TE), 200);
+    %     plot(ax, xf, f(xf), '-', 'Color', c_acc_fit, 'LineWidth', 2.0, ...
+    %         'DisplayName', 'TE Acc fit');
+    % end
+    % if length(px_TM) >= 3
+    %     [f, ~] = fit(px_TM', acc_TM', fit_eqn, fit_options);
+    %     xf = linspace(min(px_TM), max(px_TM), 200);
+    %     plot(ax, xf, f(xf), '--', 'Color', c_acc_fit, 'LineWidth', 2.0, ...
+    %         'DisplayName', 'TM Acc fit');
+    % end
 
     % ---- TRUE CC ----
-    errorbar(ax, px_TE, trueCC_TE, trueCC_TE_std, 'o', ...
+    plot(ax, px_TE, trueCC_TE, 'o', ...
         'Color', c_true_data, 'MarkerFaceColor', c_true_data, 'MarkerSize', 7, ...
-        'LineWidth', 1.2, 'CapSize', 5, 'LineStyle', 'none', ...
-        'DisplayName', 'TE True CC');
-    errorbar(ax, px_TM, trueCC_TM, trueCC_TM_std, 's', ...
-        'Color', c_true_data, 'MarkerFaceColor', c_true_data, 'MarkerSize', 7, ...
-        'LineWidth', 1.2, 'CapSize', 5, 'LineStyle', 'none', ...
-        'DisplayName', 'TM True CC');
+        'LineWidth', 1.2, 'LineStyle', 'none', 'DisplayName', 'TE True CC');
+    plot(ax, px_TM, trueCC_TM, 's', ...
+        'Color', [0.92, 0.45, 0.45], 'MarkerFaceColor', [0.92, 0.45, 0.45], 'MarkerSize', 7, ...
+        'LineWidth', 1.2, 'LineStyle', 'none', 'DisplayName', 'TM True CC');
 
-    xlabel(ax, xlab,            'FontSize', 13);
+    xlabel(ax, xlab,               'FontSize', 13);
     ylabel(ax, 'Count Rate (cps)', 'FontSize', 13);
-    title(ax,  tstr,            'FontSize', 13);
+    title(ax,  tstr,               'FontSize', 13);
     legend(ax, 'Location', 'northwest', 'FontSize', 9, 'NumColumns', 2);
     set(ax, 'FontSize', 11, 'LineWidth', 0.8);
 end
@@ -239,38 +200,37 @@ sgtitle('Coincidence Rates vs Pump Power', 'FontSize', 14, 'Interpreter', 'latex
 figure('Name', 'CAR vs Power', 'Color', 'w', 'Position', [80 100 1000 430]);
 
 % ---- Left subplot: dBm ----
-ax1 = subplot(1, 2, 1);
-hold on; box on; grid on; grid minor;
-
-errorbar(powers_TE_dBm, car_TE, car_TE_std, 'o-', ...
-    'Color', c_TE_CAR, 'MarkerFaceColor', c_TE_CAR, 'MarkerSize', 8, ...
-    'LineWidth', 1.5, 'CapSize', 5, 'DisplayName', 'TE Polarization');
-errorbar(powers_TM_dBm, car_TM, car_TM_std, 's-', ...
-    'Color', c_TM_CAR, 'MarkerFaceColor', c_TM_CAR, 'MarkerSize', 8, ...
-    'LineWidth', 1.5, 'CapSize', 5, 'DisplayName', 'TM Polarization');
-
-xlabel('Pump Power (dBm)', 'FontSize', 13);
-ylabel('CAR',              'FontSize', 13);
-title('CAR vs Power (dBm)', 'FontSize', 13);
-legend('Location', 'northeast', 'FontSize', 11);
-set(ax1, 'FontSize', 11, 'LineWidth', 0.8);
+% ax1 = subplot(1, 2, 1);
+% hold on; box on; grid on; grid minor;
+% 
+% plot(powers_TE_dBm, car_TE, 'o-', ...
+%     'Color', c_TE_CAR, 'MarkerFaceColor', c_TE_CAR, 'MarkerSize', 8, ...
+%     'LineWidth', 1.5, 'DisplayName', 'TE Polarization');
+% plot(powers_TM_dBm, car_TM, 's-', ...
+%     'Color', c_TM_CAR, 'MarkerFaceColor', c_TM_CAR, 'MarkerSize', 8, ...
+%     'LineWidth', 1.5, 'DisplayName', 'TM Polarization');
+% 
+% xlabel('Pump Power (dBm)', 'FontSize', 13);
+% ylabel('CAR',              'FontSize', 13);
+% title('CAR vs Power (dBm)', 'FontSize', 13);
+% legend('Location', 'northeast', 'FontSize', 11);
+% set(ax1, 'FontSize', 11, 'LineWidth', 0.8);
 
 % ---- Right subplot: mW ----
-ax2 = subplot(1, 2, 2);
+%ax2 = subplot(1, 2, 2);
 hold on; box on; grid on; grid minor;
 
-errorbar(powers_TE_mW, car_TE, car_TE_std, 'o-', ...
+plot(powers_TE_mW, car_TE, 'o-', ...
     'Color', c_TE_CAR, 'MarkerFaceColor', c_TE_CAR, 'MarkerSize', 8, ...
-    'LineWidth', 1.5, 'CapSize', 5, 'DisplayName', 'TE Polarization');
-errorbar(powers_TM_mW, car_TM, car_TM_std, 's-', ...
+    'LineWidth', 1.5, 'DisplayName', 'TE Polarization');
+plot(powers_TM_mW, car_TM, 's-', ...
     'Color', c_TM_CAR, 'MarkerFaceColor', c_TM_CAR, 'MarkerSize', 8, ...
-    'LineWidth', 1.5, 'CapSize', 5, 'DisplayName', 'TM Polarization');
+    'LineWidth', 1.5, 'DisplayName', 'TM Polarization');
 
 xlabel('Pump Power (mW)', 'FontSize', 13);
 ylabel('CAR',             'FontSize', 13);
 title('CAR vs Power (mW)', 'FontSize', 13);
-legend('Location', 'northeast', 'FontSize', 11);
-set(ax2, 'FontSize', 11, 'LineWidth', 0.8);
+legend('Location', 'southeast', 'FontSize', 11);
+%set(ax2, 'FontSize', 11, 'LineWidth', 0.8);
 
-sgtitle('Coincidence-to-Accidental Ratio vs Pump Power TM', ...
-    'FontSize', 14, 'Interpreter', 'latex');
+%sgtitle('Coincidence-to-Accidental Ratio vs Pump Power', 'FontSize', 14, 'Interpreter', 'latex');
