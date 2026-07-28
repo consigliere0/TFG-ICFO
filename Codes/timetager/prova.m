@@ -1,0 +1,125 @@
+% =========================================================================
+%% TFG - 4-DETECTOR ENTANGLEMENT MEASUREMENT DASHBOARD
+% =========================================================================
+clear; close all; format long g
+
+% -------------------------------------------------------------------------
+% 1. INITIAL SETTINGS & FILE SELECTION
+% -------------------------------------------------------------------------
+set(groot, 'defaultTextInterpreter',         'latex')
+set(groot, 'defaultAxesTickLabelInterpreter','latex');
+set(groot, 'defaultLegendInterpreter',       'latex');
+
+% ---> MANUALLY INPUT YOUR FILENAME HERE <---
+%filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_17-58-39-HH0.txt';
+filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-02-08-HH1.txt';
+%filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-05-30-VV1.txt';
+%filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-08-10-VV0.txt';
+%%filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-15-53-DD.txt';
+%%filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-16-58-AA.txt';
+%filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-22-53-DD.txt';
+%filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-27-50-AA.txt';
+%filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-36-22-HH.txt';
+
+% data_path = '../Tests/timetagger/wvg2/data5/';
+% Coincidence window from header
+tau = 400 * 1e-12; 
+
+% -------------------------------------------------------------------------
+% 2. LOAD & PARSE DATA
+% -------------------------------------------------------------------------
+try
+    % The header has 10 lines before the actual data starts
+    data = readtable(filename, 'FileType', 'text', 'Delimiter', ',', ...
+        'NumHeaderLines', 11, 'VariableNamingRule', 'preserve');
+catch
+    error('Could not read the file. Check the filename and path.');
+end
+
+% Extract Time/Index
+time_idx = data{:, 1};
+
+% Extract Singles (Assuming CH1=H_A, CH2=V_A, CH3=H_B, CH4=V_B)
+S_HA = data{:, 3};
+S_VA = data{:, 4};
+S_HB = data{:, 5};
+S_VB = data{:, 6};
+
+% Extract Raw Coincidences
+raw_HH = data{:, 8};
+raw_HV = data{:, 9};
+raw_VH = data{:, 10};
+% raw_VV = data{:, 11}; % Uncomment this once you add Coinc 4 to your setup
+
+% -------------------------------------------------------------------------
+% 3. MAGNITUDE CALCULATION (ACCIDENTALS & TRUE COINCIDENCES)
+% -------------------------------------------------------------------------
+% Calculate accidentals for each combination
+acc_HH = S_HA .* S_HB .* tau;
+acc_HV = S_HA .* S_VB .* tau;
+acc_VH = S_VA .* S_HB .* tau;
+% acc_VV = S_VA .* S_VB .* tau; % Uncomment once VV is added
+
+% Calculate True Coincidences
+true_HH = raw_HH - acc_HH;
+true_HV = raw_HV - acc_HV;
+true_VH = raw_VH - acc_VH;
+% true_VV = raw_VV - acc_VV; % Uncomment once VV is added
+
+% Calculate Averages for the Bar Chart
+avg_HH = mean(true_HH);
+avg_HV = mean(true_HV);
+avg_VH = mean(true_VH);
+% avg_VV = mean(true_VV); % Uncomment once VV is added
+
+std_HH = std(true_HH);
+std_HV = std(true_HV);
+std_VH = std(true_VH);
+% std_VV = std(true_VV); % Uncomment once VV is added
+
+% -------------------------------------------------------------------------
+% 4. PLOTTING
+% -------------------------------------------------------------------------
+figure('Name', ['Measurement Analysis: ', filename], 'Color', 'w', 'Position', [100 100 1200 500]);
+
+% --- PLOT 1: Time-Series Stability ---
+ax1 = subplot(1, 2, 1);
+hold(ax1, 'on'); box(ax1, 'on'); grid(ax1, 'on'); grid(ax1, 'minor');
+
+plot(ax1, time_idx, true_HH, '-o', 'LineWidth', 1.5, 'MarkerSize', 4, 'DisplayName', 'HH True Coinc');
+plot(ax1, time_idx, true_HV, '-s', 'LineWidth', 1.5, 'MarkerSize', 4, 'DisplayName', 'HV True Coinc');
+plot(ax1, time_idx, true_VH, '-^', 'LineWidth', 1.5, 'MarkerSize', 4, 'DisplayName', 'VH True Coinc');
+% plot(ax1, time_idx, true_VV, '-d', 'LineWidth', 1.5, 'MarkerSize', 4, 'DisplayName', 'VV True Coinc');
+
+xlabel(ax1, 'Measurement Bin (s)', 'FontSize', 12);
+ylabel(ax1, 'True Coincidences (cps)', 'FontSize', 12);
+title(ax1, 'Coincidence Stability Over Time', 'FontSize', 13);
+legend(ax1, 'Location', 'best', 'FontSize', 10);
+set(ax1, 'FontSize', 11);
+
+% --- PLOT 2: Average Coincidences (State Contrast) ---
+ax2 = subplot(1, 2, 2);
+hold(ax2, 'on'); box(ax2, 'on'); grid(ax2, 'on');
+
+% Prepare data for bar chart
+bases = categorical({'HH', 'HV', 'VH'});
+bases = reordercats(bases, {'HH', 'HV', 'VH'}); % Keep order
+means = [avg_HH, avg_HV, avg_VH];
+errors = [std_HH, std_HV, std_VH];
+
+% If you add VV, update the arrays above like this:
+% bases = categorical({'HH', 'HV', 'VH', 'VV'});
+% means = [avg_HH, avg_HV, avg_VH, avg_VV];
+% errors = [std_HH, std_HV, std_VH, std_VV];
+
+b = bar(ax2, bases, means, 'FaceColor', [0.35, 0.60, 0.90], 'EdgeColor', 'k', 'LineWidth', 1);
+
+% Add Error Bars
+%errorbar(ax2, bases, means, errors, 'k', 'LineStyle', 'none', 'LineWidth', 1.5, 'CapSize', 10);
+
+xlabel(ax2, 'Projection Basis', 'FontSize', 12);
+ylabel(ax2, 'Average True Coincidences (cps)', 'FontSize', 12);
+title(ax2, 'Average State Contrast', 'FontSize', 13);
+set(ax2, 'FontSize', 11);
+
+sgtitle([filename], 'FontSize', 14, 'Interpreter', 'none');
