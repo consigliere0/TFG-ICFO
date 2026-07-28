@@ -10,13 +10,14 @@ set(groot, 'defaultTextInterpreter',         'latex')
 set(groot, 'defaultAxesTickLabelInterpreter','latex');
 set(groot, 'defaultLegendInterpreter',       'latex');
 
-data_path = '../../Tests/timetagger/wvg2/entr2'; % Canvia-ho a la ruta de la teva carpeta si cal
+data_path = '../../Tests/timetagger/wvg2/entr2';
 tau = 400 * 1e-12; % Finestra de coincidència (400 ps)
 
 % -------------------------------------------------------------------------
 % 2. FIND AND PARSE FILES
 % -------------------------------------------------------------------------
-files = dir(fullfile(data_path, '*INTERFERENCE_A-*_B-*.txt'));
+files = dir(fullfile(data_path, '*INTERFERENCE_A-*_B-*.txt')); % entr2
+%files = dir(fullfile(data_path, '*A*-B*.txt')); % entr3
 
 % Arrays per guardar les dades
 angles_H = []; trueHH_H = []; trueHV_H = [];
@@ -30,6 +31,7 @@ for i = 1:length(files)
     
     % Extreure la base d'Alice i l'angle de Bob del nom de l'arxiu
     tokens = regexp(fname, 'INTERFERENCE_A-(H|D)_B-(\d{3})', 'tokens');
+    %tokens = regexp(fname, 'A(H|D)-B(\d{3})', 'tokens');
     if isempty(tokens)
         continue;
     end
