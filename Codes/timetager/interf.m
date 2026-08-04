@@ -42,6 +42,8 @@ for i = 1:length(files)
     % LLegir dades esquivant l'encapçalament mal format (saltem 12 línies)
     try
         data = readmatrix(full_path, 'NumHeaderLines', 12);
+        fprintf('%s -> filename_angle=%d, file_angle_RM1=%.2f, file_angle_RM2=%.2f\n', ...
+    fname, bob_angle, data(1,11), data(1,12));
     catch
         warning('No s''ha pogut llegir: %s', fname); continue;
     end
@@ -58,7 +60,7 @@ for i = 1:length(files)
     S_VB = data(1, 6);
     
     raw_HH = data(1, 8);  % Coinc1 (HH)
-    raw_HV = data(1, 10); % Coinc3 (HV) -> Ara a la columna 10!
+    raw_HV = data(1, 10); % Coinc3 (HV)
     
     % Càlcul de coincidències reals
     acc_HH = S_HA * S_HB * tau;
