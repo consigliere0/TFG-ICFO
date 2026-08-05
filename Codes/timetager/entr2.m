@@ -1,5 +1,6 @@
 % =========================================================================
 %% TFG - 4-DETECTOR ENTANGLEMENT MEASUREMENT DASHBOARD
+% entrada de cada datafile manual
 % =========================================================================
 clear; close all; format long g
 

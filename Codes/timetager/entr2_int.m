@@ -149,7 +149,7 @@ if ~isempty(angles_H)
     plot(ax1, xq_H, yq_HV_H, '-', 'Color', [0.92, 0.45, 0.45], 'LineWidth', 1.5, 'HandleVisibility','off');
     plot(ax1, angles_H, trueHV_H, 's', 'MarkerFaceColor', [0.92, 0.45, 0.45], 'MarkerEdgeColor', 'k', 'MarkerSize', 7, 'DisplayName', 'HV');
 end
-
+    
 xlabel(ax1, 'Bob''s Angle $\theta_{B}$ (deg)', 'FontSize', 12);
 ylabel(ax1, 'True Coincidences (cps)', 'FontSize', 12);
 %title(ax1, sprintf('Alice at $H | V = %.1f\\%%$ | $S_{inf} = %.2f$', vis_H*100, S_inf_H), 'FontSize', 13);
