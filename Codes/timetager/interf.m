@@ -15,8 +15,8 @@ files = dir(fullfile(data_path, '*A*-B*.txt')); %entr4
 %SWITCH ALSO ALICE AND BOB 12--13
 
 % ARRAYS to hold data
-ang_H = []; raw_HH_H = []; raw_HV_H = []; % HH = CC1; HV = CC3
-ang_D = []; raw_HH_D = []; raw_HV_D = [];
+ang_H = []; raw_HH_H = []; raw_HV_H = []; raw_VV_H = []; raw_VH_H = []; % HH = CC1; HV = CC3
+ang_D = []; raw_HH_D = []; raw_HV_D = []; raw_VV_D = []; raw_VH_D = [];
 ch1_H = []; ch2_H = []; ch3_H = []; ch4_H = []; % single counts
 ch1_D = []; ch2_D = []; ch3_D = []; ch4_D = [];
 
@@ -37,6 +37,8 @@ for k = 1:length(files)
         % CC
         raw_HH_H = [raw_HH_H, data(1, 8)];
         raw_HV_H = [raw_HV_H, data(1, 10)];
+        raw_VV_H = [raw_VV_H, data(1, 9)];
+        raw_VH_H = [raw_VH_H, data(1, 11)];
 
         % Bob angle
         ang_H = [ang_H, data(1, 12)*2];
@@ -44,10 +46,14 @@ for k = 1:length(files)
         % Accidentals calculation
         acc_HH = ch1_H .* ch3_H * tau;
         acc_HV = ch1_H .* ch4_H * tau;
+        acc_VV = ch2_H .* ch4_H * tau;
+        acc_VH = ch2_H .* ch3_H * tau;
 
         % Real coincidences
         HH_H = raw_HH_H - acc_HH;
         HV_H = raw_HV_H - acc_HV;
+        VV_H = raw_VV_H - acc_VV;
+        VH_H = raw_VH_H - acc_VH;
     end
     if RM_Alice== 22.5
         % Single counts
@@ -59,6 +65,8 @@ for k = 1:length(files)
         % CC
         raw_HH_D = [raw_HH_D, data(1, 8)];
         raw_HV_D = [raw_HV_D, data(1, 10)];
+        raw_VV_D = [raw_VV_D, data(1, 9)];
+        raw_VH_D = [raw_VH_D, data(1, 11)];
 
         % Bob angle
         ang_D = [ang_D, data(1, 12)*2];
@@ -66,17 +74,22 @@ for k = 1:length(files)
         % Accidentals calculation
         acc_HH = ch1_D .* ch3_D * tau;
         acc_HV = ch1_D .* ch4_D * tau;
+        acc_VV = ch2_D .* ch4_D * tau;
+        acc_VH = ch2_D .* ch3_D * tau;
 
         % Real coincidences
         HH_D = raw_HH_D - acc_HH;
         HV_D = raw_HV_D - acc_HV;
+        VV_D = raw_VV_D - acc_VV;
+        VH_D = raw_VH_D - acc_VH;
     end
 end
 
 % Sort by angle in ascending order
 [ang_H_sort, idxH] = sort(ang_H, 'ascend');
-HH_H_sort = HH_H(idxH);
-HV_H_sort = HV_H(idxH);
+%HH_H_sort = HH_H(idxH);
+HH_H_sort = VV_H(idxH);
+HV_H_sort = VH_H(idxH);
 
 [ang_D_sort, idxD] = sort(ang_D, 'ascend');
 HH_D_sort = HH_D(idxD);
@@ -105,13 +118,21 @@ if ~isempty(ang_H_sort)
 
     % curve (same as your working code):
     yq_H_HH = spline(ang_H_sort, HH_H_sort, xq_H);
+    yq_H_HV = spline(ang_H_sort, HV_H_sort, xq_H);
 
     plot(ax1, xq_H, yq_H_HH, '-', ...
         'Color',[0.35 0.60 0.90], 'LineWidth',1.5, 'HandleVisibility','off');
 
+    plot(ax1, xq_H, yq_H_HV, '-', ...
+        'Color',[0.92, 0.45, 0.45], 'LineWidth',1.5, 'HandleVisibility','off');
+
     plot(ax1, ang_H_sort, HH_H_sort, 'o', ...
         'MarkerFaceColor',[0.35 0.60 0.90], ...
         'MarkerEdgeColor','k', 'MarkerSize',7, 'DisplayName','HH');
+
+    plot(ax1, ang_H_sort, HV_H_sort, 'o', ...
+        'MarkerFaceColor',[0.92, 0.45, 0.45], ...
+        'MarkerEdgeColor','k', 'MarkerSize',7, 'DisplayName','HV');
 end
 
 xlabel(ax1, 'Bob''s Angle $\theta_{B}$ (deg)', 'FontSize',12);
@@ -128,13 +149,20 @@ if ~isempty(ang_D_sort)
     xq_D = linspace(min(ang_D_sort), max(ang_D_sort), 200);
 
     yq_D_HH = spline(ang_D_sort, HH_D_sort, xq_D);
+    yq_D_HV = spline(ang_D_sort, HV_D_sort, xq_D);
+
 
     plot(ax2, xq_D, yq_D_HH, '-', ...
+        'Color',[0.35 0.60 0.90], 'LineWidth',1.5, 'HandleVisibility','off');
+    plot(ax2, xq_D, yq_D_HV, '-', ...
         'Color',[0.92, 0.45, 0.45], 'LineWidth',1.5, 'HandleVisibility','off');
 
     plot(ax2, ang_D_sort, HH_D_sort, 'o', ...
-        'Color',[0.92, 0.45, 0.45], 'LineWidth',1.5, ...
+        'Color',[0.35 0.60 0.90], 'LineWidth',1.5, ...
         'MarkerSize',7, 'DisplayName','HH');
+    plot(ax2, ang_D_sort, HV_D_sort, 'o', ...
+        'MarkerFaceColor',[0.92, 0.45, 0.45], ...
+        'MarkerEdgeColor','k', 'MarkerSize',7, 'DisplayName','HV');
 end
 
 xlabel(ax2, 'Bob''s Angle $\theta_{B}$ (deg)', 'FontSize',12);
