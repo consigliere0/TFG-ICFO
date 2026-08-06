@@ -9,7 +9,7 @@ set(groot, 'defaultLegendInterpreter',       'latex');
 
 % DATA
 tau = 400 * 1e-12; % coincidence window 400ps
-data_path = '../../Tests/timetagger/wvg2/entr5';
+data_path = '../../Tests/timetagger/wvg2/entr4';
 files = dir(fullfile(data_path, '*A*-B*.txt')); %entr4
 %files = dir(fullfile(data_path, '*INTERFERENCE_A-*_B-*.txt')); % entr2
 %SWITCH ALSO ALICE AND BOB 12--13
@@ -88,8 +88,8 @@ end
 % Sort by angle in ascending order
 [ang_H_sort, idxH] = sort(ang_H, 'ascend');
 %HH_H_sort = HH_H(idxH);
-HH_H_sort = VV_H(idxH);
-HV_H_sort = VH_H(idxH);
+HH_H_sort = HH_H(idxH);
+HV_H_sort = HV_H(idxH);
 
 [ang_D_sort, idxD] = sort(ang_D, 'ascend');
 HH_D_sort = HH_D(idxD);
@@ -141,6 +141,7 @@ title(ax1, sprintf('Alice at $H$ | $V = %.1f\\%%$', vis_H*100), 'FontSize',13);
 legend(ax1,'Location','best','FontSize',10);
 set(ax1,'FontSize',11);
 
+%%
 % -------- Plot 2: D --------
 ax2 = subplot(1,2,2);
 hold(ax2,'on'); box(ax2,'on'); grid(ax2,'on');
@@ -170,3 +171,26 @@ ylabel(ax2, 'True Coincidences (cps)', 'FontSize',12);
 title(ax2, sprintf('Alice at $D$ | $V = %.1f\\%%$', vis_D*100), 'FontSize',13);
 legend(ax2,'Location','best','FontSize',10);
 set(ax2,'FontSize',11);
+
+%% sin fit
+%{
+% Define cosine model: y = a*cos(b*x + c) + d
+cosineModel = @(p, x) p(1) * cos(p(2) * x + p(3)) + p(4);
+ 
+% Initial parameter guesses [a, b, c, d]
+p0 = [max(y), 1, 0, mean(y)];
+ 
+% Fit the model
+pFit = lsqcurvefit(cosineModel, p0, x, y);
+ 
+% Plot results
+plot(x, y, 'bo', x, cosineModel(pFit, x), 'r-', 'LineWidth', 2);
+legend('Data', 'Cosine Fit');
+%}
+
+% x = ang_H_sort; y = HH_H_sort;
+% cosineModel = @(p, x) p(1) * cos(p(2) * x + p(3)) + p(4);
+% p0 = [max(y), pi/360, 0, mean(y)];
+% pFit = lsqcurvefit(cosineModel, p0, x, y);
+% plot(x, y, 'bo', x, cosineModel(pFit, x), 'r-', 'LineWidth', 2);
+% legend('Data', 'Cosine Fit');
