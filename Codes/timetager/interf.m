@@ -9,7 +9,7 @@ set(groot, 'defaultLegendInterpreter',       'latex');
 
 % DATA
 tau = 400 * 1e-12; % coincidence window 400ps
-data_path = '../../Tests/timetagger/wvg2/entr4';
+data_path = '../../Tests/timetagger/wvg2/entr9';
 files = dir(fullfile(data_path, '*A*-B*.txt')); %entr4
 %files = dir(fullfile(data_path, '*INTERFERENCE_A-*_B-*.txt')); % entr2
 %SWITCH ALSO ALICE AND BOB 12--13
