@@ -189,10 +189,10 @@ set(ax2, 'FontSize', 11);
 
 % Print all fitted parameters for reference/debugging
 fprintf('\n--- Fit parameters [a, b, c, d] ---\n');
-fprintf('HH_H: a=%.3f, b=%.5f rad/deg (T=%.1f deg), c=%.3f, d=%.3f\n', pFit_HH_H, 2*pi/pFit_HH_H(2));
-fprintf('HV_H: a=%.3f, b=%.5f rad/deg (T=%.1f deg), c=%.3f, d=%.3f\n', pFit_HV_H, 2*pi/pFit_HV_H(2));
-fprintf('HH_D: a=%.3f, b=%.5f rad/deg (T=%.1f deg), c=%.3f, d=%.3f\n', pFit_HH_D, 2*pi/pFit_HH_D(2));
-fprintf('HV_D: a=%.3f, b=%.5f rad/deg (T=%.1f deg), c=%.3f, d=%.3f\n', pFit_HV_D, 2*pi/pFit_HV_D(2));
+fprintf('HH_H: a=%.3f, b=%.5f rad/deg, c=%.3f rad, d=%.3f, T=%.2f deg\n', pFit_HH_H, 2*pi/pFit_HH_H(2));
+fprintf('HV_H: a=%.3f, b=%.5f rad/deg, c=%.3f rad, d=%.3f, T=%.2f deg\n', pFit_HV_H, 2*pi/pFit_HV_H(2));
+fprintf('HH_D: a=%.3f, b=%.5f rad/deg, c=%.3f rad, d=%.3f, T=%.2f deg\n', pFit_HH_D, 2*pi/pFit_HH_D(2));
+fprintf('HV_D: a=%.3f, b=%.5f rad/deg, c=%.3f rad, d=%.3f, T=%.2f deg\n', pFit_HV_D, 2*pi/pFit_HV_D(2));
 
 
 
