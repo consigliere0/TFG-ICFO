@@ -1,0 +1,153 @@
+
+\newpage
+\section{Theory}
+\subsection{Basics of quantum information} \label{sec:qinfo}
+A pivotal moment in modern physics was the realization that classical mechanics, for all its success, fails to describe how the world behaves at the smallest scales. Classical theory assumes a strict dichotomy between waves and particles, alongside  a fully deterministic description of physical phenomena. However, neither hold true under experimentation. \cite{fox_quantum_2006}
+
+Fortunately, quantum mechanics reconciles these apparently conflicting notions by introducing the concept of \textit{wave function}. In this framework, measurement outcomes are inherently probabilistic, and randomness is taken as a fundamental postulate, rather than being a consequence of incomplete knowledge.\cite{ou_quantum_2017}\cite{hall_quantum_2013}
+
+This chapter begins with a brief overview of the quantum states of light, with particular attention on entanglement; we then devote our attention to basic non-linear optics concepts that are paramount for the experiments  blah blah blah \dots implementation, geometry, FWM \dots .
+
+
+\subsubsection{Quantum state vector}
+Let $\mathcal{H}$ be a Hilbert space, which will be assumed to be complex and separable. In quantum mechanics, a pure state is represented by a vector $\ket{\Psi(\mathbf{r},t)}\in \mathcal{H}$, hereafter simply denoted by $\ket{\Psi}$, as we shall work with finite-dimensional degrees of freedom (e.g. polarization) rather than the spatial wavefunction. Said state must be normalized, and defined up to a global phase. Similarly, observables correspond to operators acting on $\mathcal{H}$. \cite{nielsen_quantum_2010}
+
+Given a set of vectors $\{\ket{\psi_i}\}$ acting as a complete orthonormal basis of $\mathcal{H}$, the state can be written as
+\begin{equation}
+    \ket{\Psi} = \sum_{i=1}^\infty c_i \ket{\psi_i},
+\end{equation}
+where $c_i = \braket{\psi_i}{\Psi} \in \mathbb{C}$, and $\sum_i |c_i|^2 = \braket{\Psi}{\Psi}= 1$.
+
+However, not all physical systems can be described by a single state vector. Those that can are said to be in a pure state, while those that cannot are known as mixed states. To provide a more general representation of the states, the \textit{density matrix} is used, \cite{camphausen_quantum-enhanced_2023}
+\begin{equation}\label{eq:densmat}
+    \hat{\rho} = \sum_i p_i \ket{\phi_i}\bra{\phi_i},
+\end{equation}
+where $\ket{\phi_i}\in \mathcal{H}$ are normalized states (not necessarily orthogonal) with weights $p_i\geq 0$ satisfying $\sum_i p_i = 1 \iff \Tr\{\hat{\rho}\}=1$. Through the density matrix formalism one can define the purity of a state as
+\begin{equation}
+    \mathcal{P} = \Tr{\hat{\rho}^2},
+\end{equation}
+satisfying $0<\mathcal{P}\leq 1$, where $\mathcal{P}=1 \iff \hat{\rho}=\hat{\rho}^2$ corresponds to a pure state, and otherwise $\mathcal{P}< 1$ and it is mixed.
+
+\subsubsection{Entanglement and separability}
+A quantum composite system, or \textit{multipartite system}, can be decomposed into two or more quantum subsystems. Let $\mathcal{H}$ be the Hilbert space associated with a multipartite system, it is given by the tensor product of the spaces of its parts: $\mathcal{H} = \mathcal{H}_1 \otimes \mathcal{H}_2 \otimes \mathcal{H}_3 \otimes \dotsb$. \cite{mintert_basic_2009} 
+Note that, hitherto, no restriction has been placed on the dimension of $\mathcal{H}$. For the purpose of this work, we shall henceforth focus on the 2-dimensional , as is where our measurements reside.
+
+Thus, let us consider the bipartite system $\mathcal{H} = \mathcal{H}_1\otimes \mathcal{H}_2$ in which each subsystem is a pure state $\ket{\psi_i}$ ($i=1,2$). The composite system is trivially:
+\begin{equation} \label{eq:sep_state}
+    \ket{\Psi_s} = \ket{\psi_1}\otimes \ket{\psi_2}.
+\end{equation}
+In this case, the measurement on one subsystem (local measurement) does not affect the outcome on the other one: they are uncorrelated. This is denoted as a separable state.
+
+One can define a general pure state given by the superposition of the states of the form \eqref{eq:sep_state},
+\begin{equation}
+    \ket{\Psi_e} = \frac{1}{\sqrt{2}}(\ket{\psi_1}\otimes \ket{\psi_2} + \ket{\phi_1}\otimes \ket{\phi_2}),
+\end{equation}
+where $\ket{\psi_i}\neq \ket{\phi_i}$. In this case, $\nexists \ket{\psi_i}\in \mathcal{H}_1$, $\ket{\psi_j}\in \mathcal{H}_2$ such that $\ket{\Psi_e} = \ket{\psi_i} \otimes \ket{\psi_j}$. That is, local measurement on one subsystem will condition the outcome of the other subsystem, hence it is not a separable state.
+
+In general, states that can be written as a product of pure states, as in Eq. \eqref{eq:sep_state} are called \textit{separable states}. Contrarily, if there are no local states the product of which define the system $\ket{\Psi}\in \mathcal{H}$, then $\ket{\Psi}$ is an \textit{entangled state} \cite{mintert_basic_2009}, \cite{camphausen_quantum-enhanced_2023}, \cite{signorini_intermodal_2019}.
+
+\Comment{\textbf{Mention sth regarding mixed states? wouldn't want it to be too long tho}}
+
+\subsubsection{Qubits and Bell states} \label{sec:qubit}
+In classical information theory, information is encoded into the bit, with possible values 0 or 1. Its quantum counterpart is the \textit{qubit}, a bidimensional quantum state that can not only represent pure 0 and 1 states, but also their superposition: $\ket{\psi} = c_0\ket{\textbf{0}} + c_1\ket{\textbf{1}}$, satisfying $|c_0|^2 + |c_1|^2=1$ and $\braket{\textbf{0}}{\textbf{1}} = 0$ \cite{fox_quantum_2006}. Qubits are used to store quantum information, which is the basis for quantum computation and quantum communication.
+
+One can find a specific class of entangled quantum state, which are paramount in quantum information: the \textit{Bell states}. For simplicity, let us introduce the notation $\ket{\phi \psi}\equiv \ket{\phi}\otimes \ket{\psi}$, for two arbitrary states $\ket{\phi}$, $\ket{\psi}$. Then, the Bell states are defined as follows:
+\begin{align} \label{eq:bellstates1}
+    \ket{\Phi^\pm}_{AB} &= \frac{1}{\sqrt{2}}(\ket{\textbf{00}}_{AB} \pm \ket{\textbf{11}}_{AB}) \\ \label{eq:bellstates2}
+    \ket{\Psi^\pm}_{AB} &= \frac{1}{\sqrt{2}}(\ket{\textbf{01}}_{AB} \pm \ket{\textbf{10}}_{AB}),
+\end{align}
+where the subscripts $A,B$ indicate which subsystem the basis states belong to (that is, $\mathcal{H_{AB} = \mathcal{H}_A \otimes \mathcal{H}_B}$). States \eqref{eq:bellstates1} and \eqref{eq:bellstates2} are maximally entangled states, and form a maximally entangled basis, the Bell basis \cite{nielsen_quantum_2010}.
+
+
+\subsection{Photonic quantum states of light}
+Section \ref{sec:qinfo} introduced some basic concepts to represent the quantum state of a system, without making reference to any particular physical implementation. Here, we show how different quantum states can be realized by photons.
+
+
+\subsubsection{Photon number state}
+Quantum theory of light is based on the quantum harmonic oscillator (QHO), where the energy levels of a given electromagnetic field are quantized. The ground state of the QHO represents the lowest-energy configuration, denoted as $\ket{0}$. The operators that increase or decrease the eigenstate are the creation and annihilation operators, denoted by convention as $\hat{a}^\dagger$ and $\hat{a}$, respectively. By applying the creation operator to the ground state a single electromagnetic quanta is generated: a photon \cite{camphausen_quantum-enhanced_2023}.
+
+Such ladder-like treatment naturally leads to the number state representation, in which each eigenstate is labelled as $\ket{n}$, the \textit{number state} or Fock state. This way, given the Hamiltonian of a harmonic oscillator $\hat{H}$, the energies will be given by $\hat{H} \ket{n} =E_n \ket{n}= (n + \frac{1}{2})\hbar \omega $, and the application of the creation operator $\hat{a}^\dagger$ yields a new eigenstate of energy $E_n + \hbar \omega$ \cite{fox_quantum_2006}. Consequently, we can define the following operations:
+\begin{align}
+    \label{eq:creation}
+    \hat{a}^\dagger \ket{n} &= \sqrt{n+1} \ket{n+1} \\
+    \hat{a}\ket{n} &= \sqrt{n} \ket{n-1} \label{eq:annihilation},
+\end{align}
+for the creation operator and annihilation operators, respectively. We can whence express the Fock state as follows:
+\begin{equation}
+    \ket{n} = \frac{(\hat{a}^\dagger)^n}{\sqrt{n!}}\ket{0}.
+\end{equation}
+
+Let us define the photon number operator, $\hat{N} = \hat{a}^\dagger \hat{a}$, which satisfies $\hat{N}\ket{n} = n\ket{n}$, and we can thus easily obtain the number of photons of a state: $\bra{n}\hat{N}\ket{n} = n$.
+
+Interestingly, the photon number representation can be used to define a coherent state $\ket{\alpha}$:
+\begin{equation} \label{eq:coherent}
+    \ket{\alpha} = e^{-|\alpha|^2/2} \sum_{n=0}^\infty \frac{\alpha^n}{\sqrt{n!}} \ket{n}.
+\end{equation}
+The expectation value yields the mean photon number of a coherent state: $\bra{\alpha} \hat{N}\ket{\alpha}=|\alpha|^2=\bar{n}$. This result agrees  with the classical notion of the intensity of a coherent electromagnetic field. Finally, it is useful to compute the probability that there are $n$ photons in a coherent state,
+\begin{equation}\label{eq:poisson}
+    \mathcal{P}(n) = |\braket{n}{\alpha}|^2= e^{-|\alpha|^2}\frac{|\alpha^2|^n}{n!} = \frac{\bar{n}^n}{n!}e^{-\bar{n}}.
+\end{equation}
+Note that Eq. \eqref{eq:poisson} is a Poisson distribution with variance $\bar{n}$, therefore concluding that coherent states have an uncertainty in photon number with $\sigma = \sqrt{\bar{n}}$. Poissonian photon statistics cause \textit{shot noise} in photodetection \cite{fox_quantum_2006} \cite{camphausen_quantum-enhanced_2023} \cite{ou_quantum_2017}.
+
+
+
+\subsubsection{Polarization degree of freedom}
+Qubits are realized via physical systems that meet the requirements presented in \ref{sec:qubit}. In rough terms, an individual quantum system with two clearly distinguishable and measurable states. Polarization-encoded qubits are a commonly adopted approach, due to their robustness in transmission and the readily available tools for state manipulation \cite{zhu_-demand_2022}, \cite{lu_generation_nodate}. In particular, we shall focus on linear polarization.
+
+Let us begin by defining the $\ket{H}$ and $\ket{V}$ as the following single photon Fock states:
+\begin{align}
+    \ket{H} = \hat{a}^\dagger _H \ket{0}, \\
+    \ket{V} = \hat{a}^\dagger _V \ket{0},
+\end{align}
+where the $H$ ($V$) subscript on the $\hat{a}^\dagger$ operators indicates that the photon is created in the horizontal (vertical) polarization mode. As they are orthogonal to each other, $\ket{H}$ and $\ket{V}$ make for natural qubit basis vectors, that is:
+$
+    \ket{\textbf{0}} \equiv \ket{H},
+    \ket{\textbf{1}} \equiv \ket{V}.
+$
+Furthermore, it is useful to define the diagonal and anti-diagonal linear polarization states, respectively:
+\begin{align}
+    \ket{D} &= \frac{1}{\sqrt{2}}(\ket{H}+\ket{V}), \\
+    \ket{A} &= \frac{1}{\sqrt{2}} (\ket{H}-\ket{V}).
+\end{align}
+Whichever direction is taken as "horizontal" and "vertical" is arbitrary, however typical practice in laboratory experiments is to designate the direction parallel to the table surface as "horizontal" \cite{camphausen_quantum-enhanced_2023}.
+
+Recalling the definition of Bell states, in \eqref{eq:bellstates1} and \eqref{eq:bellstates2}, it is clear that they can be realized with two entangled polarized photons. For instance,
+\begin{equation}
+    \ket{\Phi^+} = \frac{1}{\sqrt{2}}(\ket{HH}_{AB} + \ket{VV}_{AB}),
+\end{equation}
+where photons $A$ and $B$ are entangled in their polarization degrees of freedom. Although photons are bosons and therefore a two-photon state is symmetrical upon exchange (as they do not obey Pauli's exclusion principle), it is useful to assign labels $A$, $B$ when said pair is distinguishable in some other degree of freedom besides polarization --let it be spatial mode, time-bin, frequency, or orbital angular momentum. This way, it is possible to track them separately.
+\Comment{\textbf{aquell paper del títol taronja}}
+
+\subsubsection{Bell's theorem and the CHSH inequality}
+The introduction of the concept of entangled state led to relevant discussions on the nature of this phenomenon. Famously, the physicists A. Einstein, B. Podolsky and N. Rosen published a paper, the EPR paradox, in which they challenged the Copenhagen interpretation of quantum theory CITE. They proposed that quantum mechanics is an incomplete theory, and that the supposedly probabilistic character of measurement outcomes are in fact determined by hidden variables, not accounted for by the quantum formalism.
+
+
+\section{drafts}
+\subsubsection{Bell}
+Crucially, the specific version of this proposal relevant to the EPR argument assumes such variables to be \textit{local}, in the sense that the outcome of a measurement on one subsystem cannot depend on the choice of measurement performed on a distant, non-interacting subsystem. This is known as a local hidden-variable (LHV) theory, and it stands in direct contrast to the Copenhagen interpretation, in which the entangled state is described by a single, non-local wave function until measurement.
+
+In 1964, John Bell showed that the LHV and quantum-mechanical descriptions are not merely philosophically distinct, but experimentally distinguishable \cite{bell_epr_1964}. Bell derived an inequality that must be satisfied by any LHV theory; quantum mechanics, by contrast, predicts scenarios in which this inequality is violated. This result, known as Bell's theorem, thus provides a concrete experimental test capable of ruling out local realism.
+
+Several equivalent forms of Bell's theorem exist; the one most commonly used in experiments is due to Clauser, Horne, Shimony and Holt (CHSH) \cite{clauser_proposed_1969}. Following their formulation, one defines a correlation function $E(\theta_a,\theta_b)$ for measurements performed at settings $\theta_a$ and $\theta_b$ on the two subsystems, and combines four such correlations, measured at settings $\theta_a,\theta_a'$ and $\theta_b,\theta_b'$, into the CHSH parameter
+\begin{equation} \label{eq:chsh_S}
+    S = E(\theta_a,\theta_b) - E(\theta_a,\theta_b') + E(\theta_a',\theta_b) + E(\theta_a',\theta_b').
+\end{equation}
+Any LHV theory satisfies $|S|\leq 2$, while quantum mechanics allows values up to $|S| = 2\sqrt{2}$ for suitably chosen measurement settings and a maximally entangled state \cite{clauser_proposed_1969}.
+
+A measured value of $S$ exceeding 2 constitutes an experimental violation of the CHSH inequality, and is therefore taken as evidence that the measured state cannot be described by an LHV theory --- that is, that it is genuinely entangled. This was first demonstrated experimentally by Aspect and co-workers \cite{aspect_experimental_1982}, and CHSH violation has since become the standard benchmark used to certify entanglement in photonic sources such as the one presented in this work.
+%
+%
+%
+%
+
+\subsection{Nonlinear optics}
+\subsubsection{Third-order susceptibility}
+\subsubsection{Four-wave mixing}
+\subsubsection{Generation geometries}
+
+
+%
+%
+%
+%
+%
