@@ -3,11 +3,12 @@ import time
 import csv
 import os
 
+
 def run_fwm_sweep():
     rm = pyvisa.ResourceManager()
 
     new_folder = "wvg6_TM1"
-    os.makedirs(new_folder, exist_ok=True)  
+    os.makedirs(new_folder, exist_ok=True)
 
     santec_ip = "192.168.1.100"
     osa_ip = "192.168.55.10"
@@ -25,30 +26,30 @@ def run_fwm_sweep():
     try:
         print("WASSUP GANG")
         print("Time to conquer these streets. Booting sequence...")
-        
+
         # --- SANTEC SEED LASER CONFIG ---
         print("Connecting to Santec Seed Laser...")
         seed = rm.open_resource(f"TCPIP0::{santec_ip}::5000::SOCKET")
-        seed.write_termination = "\r"  
-        seed.read_termination = "\r"   
+        seed.write_termination = "\r"
+        seed.read_termination = "\r"
         seed.timeout = 5000
 
-        seed.write("*CLS")  
-        seed.write(":POW:STAT 1")  
+        seed.write("*CLS")
+        seed.write(":POW:STAT 1")
         time.sleep(0.5)
-        seed.write(":POW 10.00")  
-        seed.query("*OPC?")  
+        seed.write(":POW 10.00")
+        seed.query("*OPC?")
 
         # --- YOKOGAWA OSA CONFIG ---
         print("Connecting to Yokogawa OSA...")
         osa = rm.open_resource(f"TCPIP0::{osa_ip}::10001::SOCKET")
-        osa.write_termination = "\r\n"  
+        osa.write_termination = "\r\n"
         osa.read_termination = "\n"
-        
-        # Ensure the PyVISA timeout is long enough for a full sweep (60 seconds)
-        osa.timeout = 60000 
 
-        osa.query('open "anonymous"')  
+        # Ensure the PyVISA timeout is long enough for a full sweep (60 seconds)
+        osa.timeout = 60000
+
+        osa.query('open "anonymous"')
         osa.query(" ")
 
         print(f"Configuring OSA: center {center_wl} nm, Span {osa_span} nm...")
@@ -66,7 +67,7 @@ def run_fwm_sweep():
             # 1. Move seed
             seed.write(f":WAV {wl_str}")
             seed.query("*OPC?")
-            time.sleep(1.5) 
+            time.sleep(1.5)
 
             # 2. Force Trace A to accept new data
             osa.write(":TRAC:ATTR:TRA WRIT")
@@ -101,7 +102,7 @@ def run_fwm_sweep():
                 writer.writerow(["Wavelength [m]", "Power [dBm]"])
                 for x, y in zip(wls, pws):
                     writer.writerow([x, y])
-                    
+
             print(f"Saved {len(wls)} points to: {filepath}")
             current_wl += step_size
 
@@ -123,6 +124,7 @@ def run_fwm_sweep():
             except:
                 pass
             osa.close()
+
 
 if __name__ == "__main__":
     run_fwm_sweep()
