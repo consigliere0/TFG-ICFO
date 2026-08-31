@@ -12,15 +12,15 @@ set(groot, 'defaultAxesTickLabelInterpreter','latex');
 set(groot, 'defaultLegendInterpreter',       'latex');
 
 % ---> ENTR2<---
-%filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_17-58-39-HH0.txt';
-%filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-02-08-HH1.txt';
-%filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-05-30-VV1.txt';
-%filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-08-10-VV0.txt';
-%%filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-15-53-DD.txt';
-%%filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-16-58-AA.txt';
-%filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-22-53-DD.txt';
-%filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-27-50-AA.txt';
-%filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-36-22-HH.txt';
+% filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_17-58-39-HH0.txt';
+% filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-02-08-HH1.txt';
+% filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-05-30-VV1.txt';
+% filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-08-10-VV0.txt';
+%filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-15-53-DD.txt';
+%filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-16-58-AA.txt';
+% filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-22-53-DD.txt';
+% filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-27-50-AA.txt';
+% filename = '../../Tests/timetagger/wvg2/entr2/2026-07-20_18-36-22-HH.txt';
 
 % Coincidence window from header
 tau = 400 * 1e-12; 
