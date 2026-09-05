@@ -11,7 +11,7 @@ set(groot, 'defaultLegendInterpreter',       'latex');
 %%       Data processing
 % *******************************
 tau = 400 * 1e-12; % coincidence window 400ps
-acq_time = 10;     % <--- SET YOUR ACQUISITION TIME PER POINT (SECONDS) HERE
+acq_time = 10;   
 
 data_path = '../../Tests/timetagger/wvg2/entr9';
 files = dir(fullfile(data_path, '*A*-B*.txt')); 
@@ -342,13 +342,7 @@ fprintf('S (fit)=%.4f  S (raw)=%.4f  sigma_S=%.4f  N_sigma(raw)=%.2f\n', ...
 
 
 % =========================================================================
-% CHSH RIGOROUS UNCERTAINTY: weighted fit + delta-method propagation
-% =========================================================================
-% Insert this AFTER your existing script computes: ang_B1_sort, ang_B2_sort,
-% A0_B, A0_B90, A90_B, A90_B90, A45_B, A45_B90, Am45_B, Am45_B90,
-% err_A0_B, err_A0_B90, err_A90_B, err_A90_B90,
-% err_A45_B, err_A45_B90, err_Am45_B, err_Am45_B90, b_opt, bp_opt,
-% b_con, bp_con, corr_error(), cosineModel, opts
+% CHSH UNCERTAINTY: weighted fit + delta-method propagation
 % =========================================================================
 
 %% --- Per-point uncertainty on the correlators themselves ---
@@ -393,7 +387,7 @@ fprintf('S = %.4f +/- %.4f  (%.2f sigma above the classical bound of 2)\n', ...
 
 
 %% =========================================================================
-% LOCAL FUNCTIONS (add these alongside your existing local functions)
+% LOCAL FUNCTIONS
 % =========================================================================
 
 function [pFit, xq, yq] = local_fit_cosine(x, y, cosineModel, opts)

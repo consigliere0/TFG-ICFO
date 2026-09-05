@@ -23,10 +23,10 @@ set(groot, 'defaultLegendInterpreter','latex');
 % =========================================================================
 % Definim els directoris dels conjunts que volem comparar
 dataFolders = { ...
-    '../Tests/stimFWM/wvg2_TE1', ... % Guanyador TE
-    '../Tests/stimFWM/wvg2_TM1', ... % Guanyador TM
-    '../Tests/stimFWM/wvg6_TE1', ... % Perdedor TE
-    '../Tests/stimFWM/wvg6_TM1'  ... % Perdedor TM
+    '../../Tests/stimFWM/wvg2_TE1', ... % Guanyador TE
+    '../../Tests/stimFWM/wvg2_TM1', ... % Guanyador TM
+    '../../Tests/stimFWM/wvg6_TE1', ... % Perdedor TE
+    '../../Tests/stimFWM/wvg6_TM1'  ... % Perdedor TM
 };
 
 % Etiquetes per a la llegenda del gràfic
@@ -208,15 +208,16 @@ for f = 1:length(dataFolders)
 end
 
 grid on;
-xlabel('Generated Photon Wavelength (nm)', 'FontSize', 11);
-ylabel('Normalized Efficiency $10\log_{10}(\eta_{norm})$ [dB W$^{-2}$]', 'FontSize', 11);
-%title('Sagnac Loop FWM Performance: $wvg_2$ (Winner) vs $wvg_6$ (Loser)', 'FontSize', 12);
+xlabel('Generated Photon Wavelength (nm)', 'FontSize', 15);
+ylabel('Normalized Efficiency $10\log_{10}(\eta_{norm})$ [dB W$^{-2}$]', 'FontSize', 15);
+%title('Sagnac Loop FWM Performance: $wvg_2$ (Winner) vs $wvg_6$ (Loser)', 'FontSize', 16);
+set(gca, 'FontSize', 13);
 
 % Límits eix Y configurats a [0 100] tal com tenies predefinit, modifica si canvia el rang
 ylim([0 40]); 
 
 % Afegim la llegenda utilitzant intèrpret de LaTeX per admetre subíndexs ($wvg_3$)
-legend(plotsForLegend, setLabels, 'Location', 'best', 'FontSize', 10);
+legend(plotsForLegend, setLabels, 'Location', 'best', 'FontSize', 14);
 
 hold off;
 
@@ -402,18 +403,20 @@ subplot(2, 1, 1);
 plot(clean_seed_wl_nm, clean_seed_pwr, '-s', 'LineWidth', 1.5, ...
      'Color', '#90CAF9', 'MarkerFaceColor', '#90CAF9', 'MarkerSize', 4);
 grid on;
-xlabel('Seed Wavelength (nm)', 'FontSize', 10);
-ylabel('Seed Power (dBm)', 'FontSize', 10);
-%title('Input Seed Power Sweep (Fabry-Perot)', 'FontSize', 11);
+xlabel('Seed Wavelength (nm)', 'FontSize', 14);
+ylabel('Seed Power (dBm)', 'FontSize', 14);
+set(gca, 'FontSize', 12);
+%title('Input Seed Power Sweep (Fabry-Perot)', 'FontSize', 15);
 
 % --- SUBPLOT 2: Generated Signal Power vs Wavelength (Pastel Red) ---
 subplot(2, 1, 2);
 plot(wl_idler_valid, P_idler_dBm, '-s', 'LineWidth', 1.5, ...
      'Color', '#EF9A9A', 'MarkerFaceColor', '#EF9A9A', 'MarkerSize', 4);
 grid on;
-xlabel('Generated Photon Wavelength (nm)', 'FontSize', 10);
-ylabel('Generated Photon Power (dBm)', 'FontSize', 10);
-%title('Generated Signal Power Performance ($wvg_2$ TE)', 'FontSize', 11);
+xlabel('Generated Photon Wavelength (nm)', 'FontSize', 14);
+ylabel('Generated Photon Power (dBm)', 'FontSize', 14);
+set(gca, 'FontSize', 12);
+%title('Generated Signal Power Performance ($wvg_2$ TE)', 'FontSize', 15);
 
 % Desem exclusivament aquesta imatge unificada
 saveas(fig_subplots, fullfile(outFolder, 'Seed_vs_Generated_Subplots.png'));
@@ -566,19 +569,19 @@ end
 
 % Referència fina i elegant del Pump central (estil puntejat discret)
 xline(wl_pump*1e9, ':', 'Color', [0.4 0.4 0.4], 'LineWidth', 1.8, ...
-      'Label', 'Pump', 'LabelOrientation', 'horizontal', 'FontSize', 10);
+      'Label', 'Pump', 'LabelOrientation', 'horizontal', 'FontSize', 14);
 
 % Configuració d'etiquetes en LaTeX
-xlabel('Wavelength (nm)', 'FontSize', 12); 
-ylabel('Power (dBm)', 'FontSize', 12);
-title('Spectral Evolution of the Generated Signal', 'FontSize', 13, 'FontWeight', 'bold');
+xlabel('Wavelength (nm)', 'FontSize', 16); 
+ylabel('Power (dBm)', 'FontSize', 16);
+title('Spectral Evolution of the Generated Signal', 'FontSize', 17, 'FontWeight', 'bold');
 
 % Estilització externa de la caixa de l'eix (Normes d'impacte científic)
 box on;
 set(gca, ...
     'TickDir', 'out', ...          % Ticks apuntant cap a fora
     'LineWidth', 1.2, ...          % Marc sòlid
-    'FontSize', 11, ...            % Text altament llegible per al pòster
+    'FontSize', 14, ...            % Text altament llegible per al pòster
     'GridColor', [0.85 0.85 0.85], ... % Reixeta atenuada de fons
     'GridAlpha', 0.5);
 grid on; 
@@ -589,7 +592,8 @@ colormap(custom_map);
 cb = colorbar;
 cb.Label.Interpreter = 'latex';
 cb.Label.String = 'Experimental Sweep Index ($\rightarrow$ Time Evolution)';
-cb.Label.FontSize = 11;
+cb.Label.FontSize = 14;
+cb.FontSize = 13;
 % Marcatge lògic basat en el teu vector real de fitxers
 set(cb, 'Ticks', [0, 0.5, 1], 'TickLabels', {num2str(subset_files(1)), num2str(median(subset_files)), num2str(subset_files(end))});
 

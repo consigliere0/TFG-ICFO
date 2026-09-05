@@ -1,0 +1,31 @@
+With the rise of quantum mechanics protocols, one of the main affected fields is 
+Given the recent advancements in quantum mechanics, it poses as a threat to the security of communications
+
+
+S1 -- MOTIVATION
+As you know, much of today's infrastructure relies on secure data transmission, from private communication to confidential data protection. With the rise of quantum technologies, this status quo is being threatened. Fortunately, QM offers ... solutions.In particular, device-independent QKD, which can only be achieved through entanglement.
+
+Thus, we need an entanglement source. Photons are the physical system of choice in communication, as they have weak decoherence and can be transmitted through fibre. Moreover, due to its robustness to environmental interference, polarization is the degree of freedom chosen for entanglement.
+
+
+S2 -- SOTA
+EPS currently span from bulk optics, to fibre-based, to photonic integrated circuits, with entanglement generally achieved via either SPDC or SFWM, depending on which nonlinear process is exploited. Currently, bulk SPDC is the most mature EPS.
+If our aim is a globally deployed technology, PICs are our choice, as they are small and robust, with mass-manufacturability potential. However, as of now we are trading off performance metrics.
+
+The three leading materials for chip integration are the following. TFLN and AlGaAs both have the advantage of having secons order NL, which yields brighter sources. However, being not inherenttly CMOS compatible, the cost production is high, so they're not easily scalable. On the other hand, Silicon has the weaker third NL, but being CMOS comp it can be seamlessly integrated into the existing infrastructure: low cost, mass manufacturable. For these reasons, it is the platform of choice of this work.
+
+As to which circuit leads to entanglement, MRR are the current state of the art, as they enhance SFWM efficiency. However, on their own they generate frequency-ent, not pol-ent.
+
+
+S3 -- SOTA: circuits
+
+S4 -- BOTTLENECK
+Recurring to off-chip circuits and active stabilization beats the whole purpose of silicon: more complexity leads to high costs, less scalability.
+So, to date, no monolithically integrated pol-ent FWM EPS has been presented that is inherently stable.
+
+
+
+S12-NL
+In spontaneous FWM these two are correlated, but the generation efficiency is low so you need SPD.
+Classically, we can stimulate the process by introducing a strong seed wave to produce stronger outputs, that we can detect.
+The efficiency observed in the stimulated process directly relates to the efficiency of the spontaneous process.

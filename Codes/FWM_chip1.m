@@ -45,7 +45,7 @@ end
 outFolder = dataFolder; % Guardem a la mateixa carpeta
 if ~exist(outFolder, 'dir'), mkdir(outFolder); end
 % 
-for i = 100 %[1, 2, 3, 4, 5, 6, 8, 9, 10, 15, 20, 30, 35, 40, 50, 70, 72, 75, 80, 85, 90, 95, 100, 110, 120, 130, 135, 140, 146]
+for i = [1, 2, 3, 4, 5, 6, 8, 9, 10, 15, 20, 30, 35, 40, 50, 70, 72, 75, 80, 85, 90, 95, 100, 110, 120, 130, 135, 140, 146]
     sanityCheck = sweepData{i};
     fig = figure(i);
     plot(sanityCheck(:,1), sanityCheck(:,2), 'Color', '#000000');
